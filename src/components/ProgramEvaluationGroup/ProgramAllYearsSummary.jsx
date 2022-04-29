@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import processSingleProgramRecords from '../../utils/processSingleProgramRecords';
+import processSingleProgramRecords from '../../utils/processors/processSingleProgramRecords';
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import infoTooltipReference from '../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
@@ -160,13 +160,13 @@ export default class ProgramAllYearSummary extends Component {
                         </LineChart>
                     </div>
                 </div>
-                <div 
+                <div
                     className='program-part-container p-b'>
                     <h3 className="part-year-title">
                         Average Words Per Comment
                         <i data-for={'EPAFeedbackWordCount'} data-tip={infoTooltipReference.programEvaluation.EPAFeedbackWordCount} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'EPAFeedbackWordCount'} className='custom-react-tooltip' />
-            
+
                     </h3>
                     <div className='chart-container'>
                         <BarChart width={width / 2} height={300}

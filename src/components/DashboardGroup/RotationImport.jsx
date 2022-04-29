@@ -3,17 +3,10 @@ import { connect } from 'react-redux';
 import ReactSelect from 'react-select';
 import FileUpload from './FileUpload';
 import getFile from '../../utils/getFile';
-import processOne45File from '../../utils/processOne45File';
+import processOne45File from '../../utils/processors/processOne45File';
 import { setRotationSchedules } from '../../utils/requestServer';
 import _ from 'lodash';
-const possibleAcademicYears = [{ 'label': 'July 2017 - June 2018', 'value': '2017' },
-{ 'label': 'July 2018 - June 2019', 'value': '2018' },
-{ 'label': 'July 2019 - June 2020', 'value': '2019' },
-{ 'label': 'July 2020 - June 2021', 'value': '2020' },
-{ 'label': 'July 2021 - June 2022', 'value': '2021' },
-{ 'label': 'July 2022 - June 2023', 'value': '2022' },
-{ 'label': 'July 2023 - June 2024', 'value': '2023' }];
-
+import { possibleAcademicYears } from '../../utils/getAcademicYears';
 class ResidentDashboard extends Component {
 
     constructor(props) {
@@ -64,7 +57,7 @@ class ResidentDashboard extends Component {
                 <div className='m-a-md'>
                     <div className="alert alert-info">
                         <p>This page controls the rotation schedule data being shown in all the visual summary dashboards. Use it to upload the one45 export file for a particular academic year.
-                            <br /> Make sure to select the correct academic year corresponding to the data in the one45 file and also ensure that that the export is for the entire period between July 1 to Jun 30 for a given academic year.</p>
+                            <br /> Make sure to select the correct academic year corresponding to the data in the one45 file and also ensure that the export is for the entire period between July 1 to Jun 30 for a given academic year.</p>
                     </div>
                     <div className='year-selection-box'>
                         <h4 className='header'>Academic Year </h4>

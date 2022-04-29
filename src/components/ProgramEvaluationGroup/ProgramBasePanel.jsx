@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactSelect from 'react-select';
-import processSingleProgramRecords from '../../utils/processSingleProgramRecords';
+import processSingleProgramRecords from '../../utils/processors/processSingleProgramRecords';
 import Summary from './ProgramSummary';
 import EPAOverallbyRotation from './EPAOverallbyRotation';
 import infoTooltipReference from '../../utils/infoTooltipReference';

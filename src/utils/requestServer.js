@@ -6,6 +6,7 @@ import processAllLearnerData from './processors/processAllLearnerData';
 
 const ELENTRA_API = ENTRADA_URL + "/assessments" + "?section=api-learner-progress-dashboard";
 
+// Get a list of all learners in a given program and their metrics
 export function getLearnerList(params) {
     return new Promise((resolve, reject) => {
         let get_learner_data = jQuery.ajax({
@@ -22,6 +23,7 @@ export function getLearnerList(params) {
     });
 }
 
+// For a list of programs and academic year get the assessment counts
 export function getAssessmentCountByProgram(params) {
     return new Promise((resolve, reject) => {
         let get_learner_data = jQuery.ajax({
@@ -38,6 +40,7 @@ export function getAssessmentCountByProgram(params) {
     });
 }
 
+// Get all assessments of a single learner/resident
 export function getLearnerData(username, residentInfo) {
     return new Promise((resolve, reject) => {
         let get_learner_data = jQuery.ajax({
@@ -55,6 +58,7 @@ export function getLearnerData(username, residentInfo) {
     });
 }
 
+// Get all assessments in a given academic year for a given program/course
 export function getAllData(dashboard = '', academic_year = '', course = false) {
     return new Promise((resolve, reject) => {
         let get_all_learners_data = jQuery.ajax({
@@ -72,6 +76,7 @@ export function getAllData(dashboard = '', academic_year = '', course = false) {
     });
 }
 
+// Get the one45 rotation schedules for a list of residents in a given course/program
 export function getRotationSchedules(residentList = [], allRecords, courseName) {
     return new Promise((resolve, reject) => {
         let get_all_learners_data = jQuery.ajax({
@@ -85,6 +90,7 @@ export function getRotationSchedules(residentList = [], allRecords, courseName) 
     });
 }
 
+// Set the one45 rotation schedules for a list of residents in a given course/program
 export function setRotationSchedules(rotation_data) {
     return new Promise((resolve, reject) => {
         let set_rotation_request = jQuery.ajax({
@@ -97,7 +103,7 @@ export function setRotationSchedules(rotation_data) {
     });
 }
 
-
+// Common error callback for all server errors
 function errorCallback(error, reject) {
     console.log(error);
     alert("Sorry there was an error in connecting to the server, Please try reloading the page");

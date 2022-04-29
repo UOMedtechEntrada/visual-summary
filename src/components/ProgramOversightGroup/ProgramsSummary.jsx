@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import processOversightRecords from '../../utils/processOversightRecords';
+import processOversightRecords from '../../utils/processors/processOversightRecords';
 import { Line, LineChart, ReferenceLine, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import infoTooltipReference from '../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';

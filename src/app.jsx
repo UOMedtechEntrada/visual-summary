@@ -32,7 +32,12 @@ class App extends Component {
 
 
   render() {
-    return (<Provider store={store}><Container><Dashboard /></Container></Provider>)
+    return (
+      <Provider store={store}>
+        <Container>
+          <Dashboard />
+        </Container>
+      </Provider>)
   }
 }
 
