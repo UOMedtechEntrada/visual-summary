@@ -1,4 +1,5 @@
 const path = require('path');
+const pathConfig = require("./path.confg");
 const webpack = require("webpack");
 const WriteFilePlugin = require('write-file-webpack-plugin');
 
@@ -7,7 +8,7 @@ module.exports = {
     mode: 'development',
     entry: ['./src/app.jsx'],
     output: {
-        path: path.resolve("C:\\Users\\bvenk\\Sites\\elentra-1x-me\\www-root\\javascript"),
+        path: path.resolve(pathConfig.outputPath),
         filename: "visual-summary.js"
     },
     watch: true,

@@ -1,13 +1,14 @@
 'use strict';
 var webpack = require("webpack");
-var path = require("path");
+const path = require("path");
+const pathConfig = require("./path.confg");
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: 'production',
     entry: ['./src/app.jsx'],
     output: {
-        path: path.resolve("build"),
+        path: path.resolve(pathConfig.outputPath),
         filename: "visual-summary.js"
     },
     plugins: [new webpack.DefinePlugin({
@@ -25,6 +26,7 @@ module.exports = {
     }),
     new TerserPlugin({
         parallel: true,
+        extractComments: false,
         terserOptions: { ecma: 6 }
     })],
     module: {
