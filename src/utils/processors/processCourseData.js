@@ -22,7 +22,11 @@ export default function (learnerListDataDump, dashboardMode = 'faculty') {
             const total_completed_assessments = getCompletedAssessmentCount(learner.learner_epa_progress);
 
             // update the achievement rate to reflect these new numbers
-            const achievementRate = totalAssessmentCount !== 0 ? total_completed_assessments / totalAssessmentCount : 0;
+            let achievementRate = totalAssessmentCount !== 0 ? total_completed_assessments / totalAssessmentCount : 0;
+            // force the achievement rate to be zero 
+            if (isNaN(achievementRate)) {
+                achievementRate = 0;
+            }
 
             return ({
                 "username": learner.proxy_id,
@@ -44,7 +48,7 @@ export default function (learnerListDataDump, dashboardMode = 'faculty') {
             // Get the total assessment count for learner count list 
             const matchingLearner = _.find(learner_assessment_counts, (e) => e['proxy_id'] == learner.proxy_id);
             // If a value is not available sub in the value from the learner metrics
-            const totalAssessmentCount = matchingLearner ? +matchingLearner.assessment_count : learner.total_assessments;
+            const totalAssessmentCount = matchingLearner ? +matchingLearner.assessment_count : (learner.total_assessments || 0);
 
             // update the achievement rate to reflect these new numbers
             const achievementRate = totalAssessmentCount !== 0 ? learnerMetricsList['completed_assessments'][learnerIndex] / totalAssessmentCount : 0;
@@ -58,13 +62,11 @@ export default function (learnerListDataDump, dashboardMode = 'faculty') {
                 "totalValidAssessments": learner.total_assessments,
                 "totalAssessments": totalAssessmentCount,
                 "totalProgress": learner.total_progress,
-                "completedAssessments": learnerMetricsList['completed_assessments'][learnerIndex],
+                "completedAssessments": learnerMetricsList['completed_assessments'][learnerIndex] || 0,
                 "achievementRate": Math.round(achievementRate * 100)
             })
         });
     }
-
-
 }
 
 

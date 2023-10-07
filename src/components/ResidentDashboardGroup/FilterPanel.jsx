@@ -5,16 +5,14 @@ import moment from 'moment';
 import _ from 'lodash';
 import ReactSelect from 'react-select';
 import { getLearnerData } from '../../utils/requestServer';
-import getTrainingStages from '../../utils/getTrainingStages';
 import {
     toggleFilterLoader, setResidentFilter, setResidentData, updateResidentData
 } from '../../redux/actions/actions';
 import { DateRangePicker } from 'react-dates';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
+import { withTranslation } from "react-i18next";
 
-const MODDED_PHASE_LIST = getTrainingStages()
-    .map((phase) => phase.split('-').join(" ").toUpperCase());
+const MODDED_PHASE_LIST = dashboard_options.dashboard_stages.map((d) => d.target_label.toUpperCase());
 
 class FilterPanel extends Component {
 
@@ -116,7 +114,7 @@ class FilterPanel extends Component {
     render() {
 
         const { filterLoaderState, residentList = []
-            , residentFilter = {}, dashboard_mode = 'faculty', residentData } = this.props,
+            , residentFilter = {}, dashboard_mode = 'faculty', residentData, t } = this.props,
             { isAllData = true, username = '',
                 startDate, endDate, hideNoDataEPAs } = residentFilter;
         //  first convert the array into the format required by react-select 
@@ -150,7 +148,7 @@ class FilterPanel extends Component {
                 <div className={('text-xs-center text-sm-left root-box ') + (isFacultyMode ? '' : 'smaller-box')}>
                     {isFacultyMode ? <div className='react-select-root-filter'>
                         <ReactSelect
-                            placeholder='Select Resident...'
+                            placeholder={t('Select Learner...')}
                             isSearchable={true}
                             value={currentSelectValue}
                             options={groupedResidentList}
@@ -162,18 +160,18 @@ class FilterPanel extends Component {
                                 })
                             }}
                             onChange={this.onResidentNameChange} />
-                    </div> : <p className='date-filter-label'>Date Filter</p>}
+                    </div> : <p className='date-filter-label'>{t("Date Filter")}</p>}
 
                     <div className='filter-button-container'>
-                        <button data-for='date-buttontip' data-tip={infoTooltipReference.residentMetrics.dateFilter}
+                        <button data-for='date-buttontip' data-tip={t("residentMetrics-dateFilter")}
                             className={'btn btn-primary-outline ' + (!isAllData ? " active-button" : "not-active")}
                             onClick={this.onDateFilterClick} ><i className="fa fa-calendar" aria-hidden="true"></i></button>
                         <ReactTooltip id='date-buttontip' delayShow={500} className='custom-react-tooltip' />
                     </div>
 
                     {isFacultyMode && <div className='text-xs-left button-box'>
-                        <button type="submit" className="filter-button btn btn-primary-outline" onClick={this.onSubmit}>
-                            GET RECORDS
+                        <button type="submit" className="filter-button btn btn-primary-outline text-uppercase" onClick={this.onSubmit}>
+                            {t("GET RECORDS")}
                             {filterLoaderState && <i className='fa fa-spinner fa-spin filter-loader'></i>}
                         </button>
                     </div>}
@@ -182,6 +180,8 @@ class FilterPanel extends Component {
                 {/* let the elements be hidden by css style instead of react , to prevent dead elements value problem when submitting */}
                 <div className={'text-xs-left advanced-filter-box ' + (!isAllData ? 'show-filter' : 'hide-filter')}>
                     <DateRangePicker
+                        startDatePlaceholderText={t("Start Date")}
+                        endDatePlaceholderText={t("End Date")}
                         hideKeyboardShortcutsPanel={true}
                         isOutsideRange={() => false}
                         startDate={startDate}
@@ -195,7 +195,7 @@ class FilterPanel extends Component {
 
                     <div className="checkbox custom-control text-center custom-checkbox">
                         <label className='custom-checkbox-label'>
-                            Hide EPAs with no assessments in the time period.
+                            {t("Hide EPAs with no assessments in the time period.")}
                             <input id='filter-dateFilterActive' type="checkbox"
                                 checked={hideNoDataEPAs} onChange={this.onHideNoRecordEPAs} />
                             <span className="custom-control-indicator"></span>
@@ -227,7 +227,7 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FilterPanel);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(FilterPanel));
 
 
 function mapDataAndMarkDatePeriod(residentData, residentFilter, programInfo, residentInfo, rotationSchedule, expiredData, setResidentData) {

@@ -3,12 +3,12 @@
 This is standalone adaptation of a series of dashboards originally developed at the University of Saskatchewan as a research project to visualize resident EPA data [(publication)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7082472/). A user guide for the dashboard suite can be found at [documentation](https://github.com/kiranbandi/cbd-dashboard-ui/blob/visual-summary/documentation/user_guide.pdf).
 
 This version of the Visual Summary dashboard suite has been modified to work within the Elentra ecosystem as an auxiliary page (visual summary) that loads along with the existing CBME dashboards in Elentra. 
-This project uses [webpack](https://webpack.js.org/) to build the entire codebase into a single file (visual-summary.js) which is then added to the Elentra code base as an external javscript file.
+This project uses [webpack](https://webpack.js.org/) to build the entire visual-summary codebase into a single file (visual-summary.js) which is then added to the Elentra code base as an external javscript file.
 
 
 ## Getting Started
 
-To get started you will need to have a version of Elentra (1.23 or above) running locally with CBME enabled courses. The visual summary page is an optional feature that needs to be enabled through a database setting (cbme_enable_visual_summary).
+To get started you will need to have a version of Elentra (1.24 or above) running locally with CBME enabled courses. The visual summary page is an optional feature that needs to be enabled through a database setting (cbme_enable_visual_summary).
 
 Also make sure to have Node JS and npm installed in your local environment to build the project.  
 
@@ -20,29 +20,24 @@ php cbme-visual-summary-statistics-generator.php --all_cbme_courses
 
 ### Installing
 
-Install the required npm modules (the additional flag is to force install certain peer dependencies) 
+Before you follow the steps below, first cd into the visual summary folder 
+then install the required npm modules (the additional flag is to force install certain peer dependencies).
 ```
 npm install --legacy-peer-deps
 ```
 ## Local Development 
-In both local development and production builds webpack will output the built `visual-summary.js`file directly into the javascript folder in the elentra-me codebase.      
-For this linking between projects to work set the `outputPath` value in the path.config.js file that can be found in the `build-config` folder.
-The `outputPath` value should be the absolute path in your local machine to the Javascript folder in elentra-me codebase.
+In both local development and production builds webpack will output a `visual-summary.js`file directly into the "visual-summary" folder in the elentra-me codebase. This file is loaded as an external script in the php section of the codebase where we instantiate the visual summary view(class Views_CBME_VisualSummary).       
 
-To run your code locally for development run webpack with the following command -
+To test your code changes to the visual-summary codebase locally for development, run webpack with the following command -
 ```
 npm run start
 ```
-This will make webpack watch for changes in your local directory and automatically build and output a new `visual-summary.js` file whenever a file in the `src` folder is changed/saved. 
-## Creating a build
+This will make webpack watch for changes in your visual-summary directory and automatically build and output a new `visual-summary.js` file whenever a file in the folder is changed/saved. Use this to make changes to the visual summary codebase and test them out locally in your machine. Once you are happy with the changes create a minified production version of the `visual-summary.js` file using the command below.
+## Creating a production build
 
-To create a production build. Run the following command to create a minified version of the source code.
+Run the following command to create a minified version of the source code.
 
 ```
 npm run build
 ```
-This will output a minified version of the `visual-summary.js` file into the linked javscript folder. 
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/kiranbandi/cbd-dashboard-ui/blob/visual-summary/LICENSE) file for details
+This will output a minified version of the `visual-summary.js` file into the "visual-summary" folder. 

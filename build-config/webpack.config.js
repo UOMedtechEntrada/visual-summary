@@ -1,5 +1,4 @@
 const path = require('path');
-const pathConfig = require("./path.confg");
 const webpack = require("webpack");
 const WriteFilePlugin = require('write-file-webpack-plugin');
 
@@ -8,13 +7,12 @@ module.exports = {
     mode: 'development',
     entry: ['./src/app.jsx'],
     output: {
-        path: path.resolve(pathConfig.outputPath),
+        path: path.join(__dirname,"../"),
         filename: "visual-summary.js"
     },
     watch: true,
     watchOptions: {
         ignored: [
-            path.resolve(__dirname, 'build'),
             path.resolve(__dirname, 'node_modules')
         ]
     },

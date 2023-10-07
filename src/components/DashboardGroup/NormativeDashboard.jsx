@@ -3,12 +3,12 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import { NormativeTable, NormativeFilterPanel, NormativeGraph } from '../';
 import ReactTooltip from 'react-tooltip';
-
+import { withTranslation } from "react-i18next";
 class NormativeDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentStage: 'All-Training-Stages',
+            currentStage: 'all-training-stages',
             removeNoRecords: true
         };
     }
@@ -18,9 +18,9 @@ class NormativeDashboard extends Component {
 
     render() {
 
-        const { residentList } = this.props, { currentStage, removeNoRecords } = this.state;
+        const { residentList, isUG, t } = this.props, { currentStage, removeNoRecords } = this.state;
 
-        const residentsInPhase = (currentStage == 'All-Training-Stages') ? residentList :
+        const residentsInPhase = (currentStage == 'all-training-stages') ? residentList :
             _.filter(residentList, (res) => res['currentPhase'] == currentStage);
 
         const filteredList = removeNoRecords ?
@@ -39,6 +39,7 @@ class NormativeDashboard extends Component {
             <div className='normative-data-container'>
                 <div className='text-center'>
                     <NormativeFilterPanel
+                        isUG={isUG}
                         currentStage={currentStage}
                         removeNoRecords={removeNoRecords}
                         onStageChange={this.onStageChange}
@@ -54,7 +55,7 @@ class NormativeDashboard extends Component {
                                 records={filteredList} />
                         </div> :
                         <h3 className='text-primary text-center m-t-lg'>
-                            Sorry there are no {removeNoRecords ? 'active' : ''} residents in the selected training stage.
+                            {t("Sorry there are no learners in the selected training stage.")}
                         </h3>}
                     <ReactTooltip className='custom-react-tooltip' id='normative-instant-info' />
                 </div>
@@ -69,4 +70,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {})(NormativeDashboard);
+export default withTranslation()(connect(mapStateToProps, {})(NormativeDashboard));

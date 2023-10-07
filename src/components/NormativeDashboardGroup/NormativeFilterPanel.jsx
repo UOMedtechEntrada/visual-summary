@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import ReactSelect from 'react-select';
-import getTrainingStages from '../../utils/getTrainingStages';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
-export default class NormativeFilterPanel extends Component {
+class NormativeFilterPanel extends Component {
     constructor(props) {
         super(props);
     }
@@ -12,9 +11,9 @@ export default class NormativeFilterPanel extends Component {
     render() {
 
         const { currentStage, removeNoRecords = false,
-            onStageChange, onNoRecordChange } = this.props;
+            onStageChange, onNoRecordChange, t } = this.props;
 
-        const trainingStageList = getTrainingStageList(),
+        const trainingStageList = getTrainingStageList(t),
             currentStageEntry = _.find(trainingStageList, (d) => d.value == currentStage) || trainingStageList[0];
 
         return (
@@ -23,32 +22,28 @@ export default class NormativeFilterPanel extends Component {
 
                     <div className='react-select-root-filter'>
                         <ReactSelect
-                            placeholder='Select Training Stage...'
+                            placeholder={t('Select Training Stage...')}
                             value={currentStageEntry}
                             options={trainingStageList}
                             styles={{
                                 option: (styles, { isSelected }) => ({
                                     ...styles,
                                     color: isSelected ? 'white' : 'black',
-                                    textAlign: 'left',
-                                    textTransform: 'capitalize'
-                                }),
-                                singleValue: (styles) => ({
-                                    ...styles,
-                                    textTransform: 'capitalize'
+                                    textAlign: 'left'
                                 })
+
                             }}
                             onChange={onStageChange} />
                     </div>
 
                     <div className="checkbox custom-control text-center custom-checkbox">
                         <label className='filter-label'>
-                            {"Filter Residents with No records"}
+                            {t("Filter Learners with No records")}
                             <input id='filter-dateFilterActive' type="checkbox"
                                 checked={removeNoRecords} onChange={onNoRecordChange} />
                             <span className="custom-control-indicator"></span>
                         </label>
-                        <i data-for='normative-instant-info' data-tip={infoTooltipReference.normativeAssessment.stages} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        <i data-for='normative-instant-info' data-tip={t("normativeAssessment-stages")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                     </div>
                 </div>
             </div>)
@@ -56,16 +51,19 @@ export default class NormativeFilterPanel extends Component {
 
 }
 
-function getTrainingStageList() {
+function getTrainingStageList(t) {
     // access the training stages 
     // TODO training stages only for one level not multiple
-    let stageListCopy = getTrainingStages();
-    // and then add an extra option all to the list
-    stageListCopy.unshift('All-Training-Stages');
-    return _.map(stageListCopy, (d) => {
+    let stageListCopy = [...dashboard_options.dashboard_stages];
+    let remappedStageList = _.map(stageListCopy, (d) => {
         return {
-            value: d,
-            label: d.split('-').join(' '),
+            value: d.target_label.split(' ').join('-').toLowerCase(),
+            label: d.target_label,
         };
     })
+    // and then add an extra option all to the list
+    remappedStageList.unshift({ value: 'all-training-stages', 'label': t('All Training Stages') });
+    return remappedStageList;
 }
+
+export default withTranslation()(NormativeFilterPanel);

@@ -7,6 +7,7 @@ import HeaderRow from './HeaderRow';
 import Tooltip from './Tooltip';
 import { NumberToEPAText } from '../../../utils/convertEPA';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
 class GraphPanel extends Component {
 
@@ -94,7 +95,7 @@ class GraphPanel extends Component {
             pageWidth = window.dynamicDashboard.mountWidth;
 
         actions.showTooltip(true, {
-            'x': event.pageX + 400 > pageWidth ? event.pageX - 400 : event.pageX,
+            'x': event.pageX + 410 > pageWidth ? event.pageX - 410 : event.pageX + 10,
             'y': event.pageY - 50,
             // Add an empty line to align info horizontally
             'comments': data['Feedback'] ? '\n' + data['Feedback'] : '',
@@ -119,7 +120,7 @@ class GraphPanel extends Component {
         let { residentData, residentFilter = {},
             isTooltipVisible,
             tooltipData, smallScreen, width,
-            levelVisibilityOpenStatus, programInfo = {} } = this.props;
+            levelVisibilityOpenStatus, programInfo = {}, t } = this.props;
 
         const { openTableID, openFilterID } = this.state;
 
@@ -171,9 +172,9 @@ class GraphPanel extends Component {
 
                     {/* code chunk for displaying titles above the table */}
                     <div className='title-root text-xs-center'>
-                        <h4 style={{ width: widthPartition }} className='title-bar'>EPA(Entrustable Professional Activity)</h4>
-                        <h4 style={{ width: widthPartition }} className='title-bar'>Observation Count</h4>
-                        <h4 style={{ width: smallScreen ? widthPartition : widthPartition * 2 }} className='title-bar'>Score History</h4>
+                        <h4 style={{ width: widthPartition }} className='title-bar'>{t("EPA(Entrustable Professional Activity)")}</h4>
+                        <h4 style={{ width: widthPartition }} className='title-bar'>{t("Observation Count")}</h4>
+                        <h4 style={{ width: smallScreen ? widthPartition : widthPartition * 2 }} className='title-bar'>{t("Score History")}</h4>
                     </div>
 
                     {/* This is the main container which houses the table contents */}
@@ -256,4 +257,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GraphPanel);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(GraphPanel));

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+window.mostCommonScaleRatings = [];
 
 export default function (allRecords = [], academicYear, trainingPhase = 'A') {
 
@@ -9,12 +10,21 @@ export default function (allRecords = [], academicYear, trainingPhase = 'A') {
         // then consider only records that were attained by residents in that phase
         recordsInYearAndPhase = trainingPhase == 'A' ? recordsInYear : _.filter(recordsInYear, (d) => d.phaseTag == trainingPhase);
 
+
+    // group the data by rating scale and get the scale that is most common for visualization
+    let mostCommonScaleLength = _.max(_.keys(_.groupBy(allRecords, d => d.scale.length)));
+    if (!mostCommonScaleLength) {
+        mostCommonScaleLength = 5;
+    }
+    let mostCommonScaleRatings = _.times(mostCommonScaleLength, (f) => f + 1);
+    window.mostCommonScaleRatings = mostCommonScaleRatings;
+
     // for some calculations we can ignore the expired records as for them the metrics dont
     // exist so we filter them out from the list
     // group records by rating and only consider the non expired ones as expired records have no rating
     // Also for rating group since we map the data to a 5 point scale
     // we only consider forms with a scale of size 5 and are Supervisor Forms
-    let validScaleRecords = _.filter(recordsInYearAndPhase, (d) => ((d.Type == "Supervisor Form") && (d.scale.length >= 5)));
+    let validScaleRecords = _.filter(recordsInYearAndPhase, (d) => ((d.Type == "Supervisor Form") && (d.scale.length >= mostCommonScaleLength)));
     let ratingGroup = _.groupBy(validScaleRecords, (d) => d.Rating),
         //get residents with available data
         residentsWithData = _.groupBy(recordsInYearAndPhase, (d) => d.username),
@@ -43,7 +53,7 @@ export default function (allRecords = [], academicYear, trainingPhase = 'A') {
             epa_count,
             expired_count,
             month_count,
-            rating_group: _.map([1, 2, 3, 4, 5], (d) => (ratingGroup[d] ? ratingGroup[d].length : 0)),
+            rating_group: _.map(mostCommonScaleRatings, (d) => (ratingGroup[d] ? ratingGroup[d].length : 0)),
             expired_epa_percentage: epa_count == 0 ? 0 : Math.round((expired_count / epa_count) * 100),
             entrustment_score: Math.round((_.meanBy(_.filter(validScaleRecords, d => d.progress == 'complete'), (dd) => +dd.Rating || 0) || 0) * 100) / 100,
             words_per_comment: Math.round(_.meanBy(completed_records, (dd) => dd.Feedback.split(" ").length) || 0)

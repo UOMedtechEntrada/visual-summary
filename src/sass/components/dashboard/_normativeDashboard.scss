@@ -17,12 +17,6 @@
                 display: inline-block;
                 margin: 0px 17px 0px 0px;
             }
-            #filter-phaselist {
-                text-transform: capitalize;
-                option {
-                    text-transform: capitalize;
-                }
-            }
             .checkbox {
                 margin-right: 0px;
                 label {
@@ -35,9 +29,7 @@
             }
         }
     }
-    .uppercase-push {
-        text-transform: capitalize;
-    }
+
     .normative-inner-root {
         .normative-table {
             display: inline-block;

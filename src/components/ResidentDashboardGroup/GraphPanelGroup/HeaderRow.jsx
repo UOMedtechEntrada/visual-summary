@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 class HeaderRow extends Component {
 
     constructor(props) {
@@ -10,7 +11,7 @@ class HeaderRow extends Component {
     render() {
 
         const { onStageLabelClick, innerKey, isCurrentSubRootVisible,
-            epaSourceMap, residentList, residentFilter } = this.props;
+            epaSourceMap, residentList, residentFilter, t } = this.props;
         let requiredEPACount = 0, achievedEPACount = 0, residentInfo, currentPhase;
 
         _.map(epaSourceMap.maxObservation, (count, epaID) => {
@@ -54,17 +55,17 @@ class HeaderRow extends Component {
 
         if (currentStageStatus.completed || allSubEPAsComplete) {
             iconLabel = 'fa-check-circle';
-            statusLabel = 'COMPLETE ';
+            statusLabel = t('Complete');
             percentageComplete = '';
         }
         else if (currentStageStatus.in_progress || percentageComplete > 0) {
             iconLabel = 'fa-hourglass-half';
-            statusLabel = 'In Progress';
+            statusLabel = t('In Progress');
             percentageComplete += '%';
         }
         else {
             iconLabel = 'fa-flag-checkered';
-            statusLabel = 'Not Started';
+            statusLabel = t('Not Started');
             percentageComplete = '';
         }
 
@@ -86,4 +87,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, null)(HeaderRow);
+export default withTranslation()(connect(mapStateToProps, null)(HeaderRow));

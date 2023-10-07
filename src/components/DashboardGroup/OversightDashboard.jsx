@@ -4,7 +4,8 @@ import ReactSelect from 'react-select';
 import _ from 'lodash';
 import ProgramsSummary from '../ProgramOversightGroup/ProgramsSummary';
 import { possibleAcademicYears } from '../../utils/getAcademicYears';
-export default class OversightDashboard extends Component {
+import { withTranslation } from "react-i18next";
+class OversightDashboard extends Component {
 
     constructor(props) {
         super(props);
@@ -58,29 +59,35 @@ export default class OversightDashboard extends Component {
 
     getProgramCounts = (academicYear) => {
         let programList = [];
-        const course_picker = document.getElementById('cbme-course-picker');
+        const { t } = this.props,
+            course_picker = document.getElementById('cbme-course-picker');
         if (course_picker && course_picker.options.length > 0) {
             programList = [...course_picker.options].map(e => ({ 'value': e.value, 'label': e.innerText }));
         }
 
+        // Keep a cloned copy of active programs if any
+        const activeProgramsClone = [...this.state.activePrograms];
+
         // turn on year program loader and reset the dashboard 
-        this.setState({ 'isProgramCountLoaderVisible': true, academicYear, programList: [], activePrograms: [], moddedProgramList: [] });
+        this.setState({ 'isProgramCountLoaderVisible': true, academicYear, activePrograms: [], programList: [], moddedProgramList: [] });
 
         getAssessmentCountByProgram({ 'academic_year': academicYear.value, 'course_ids': _.map(programList, e => e.value).join(',') })
             .then((assessment_counts) => {
-                // match the programs with their assessment counts and sort the list by count
-                let programListWithCounts = _.reverse(_.sortBy(_.map(programList, p => {
+                // match the programs with their assessment counts
+                let programListWithCounts = _.map(programList, p => {
                     let matchingProgram = _.find(assessment_counts, d => d.course_id == p.value) || { 'assessment_count': 0 },
                         matchingCount = +matchingProgram.assessment_count;
                     return {
                         'value': p.value,
-                        'label': p.label + " (" + (matchingCount == 0 ? 'No Data' : matchingCount) + ")",
-                        'count': matchingCount,
-                        'disabled': matchingCount == 0
+                        'label': p.label + " (" + (matchingCount == 0 ? t('No Data') : matchingCount) + ")",
+                        'count': matchingCount
                     };
-                }), e => e.count));
-                // Then filter out the first ten programs with non zero values and get the first 10 programs or whichever is smaller 
-                let activePrograms = _.filter(programListWithCounts, d => !d.disabled).slice(0, 10);
+                });
+
+                let activePrograms = _.filter(programListWithCounts, f => !!(_.find(activeProgramsClone, e => e.value == f.value)));
+
+                programListWithCounts = _.sortBy(_.filter(programListWithCounts, e => e.count != 0), e => e.label);
+
                 this._isMounted && this.setState({ 'programList': programListWithCounts, activePrograms, 'isProgramCountLoaderVisible': false });
             })
             .catch(() => {
@@ -101,6 +108,7 @@ export default class OversightDashboard extends Component {
 
         const { programList = [], moddedProgramList = [], activePrograms = [],
             academicYear, isLoaderVisible, isProgramCountLoaderVisible } = this.state,
+            { t } = this.props,
             fullWidth = document.body.getBoundingClientRect().width - 300;
 
 
@@ -108,7 +116,7 @@ export default class OversightDashboard extends Component {
             <div className='m-a dashboard-root-program m-b-lg' >
                 <div className='custom-select-wrapper'>
                     <div className='multi-selection-box'>
-                        <h2 className='header'>Academic Year</h2>
+                        <h2 className='header'>{t("Academic Year")}</h2>
                         <div className='react-select-root' style={{ 'width': 150 }}>
                             <ReactSelect
                                 value={academicYear}
@@ -118,11 +126,12 @@ export default class OversightDashboard extends Component {
                         </div>
                     </div>
                     <div className='multi-selection-box p-l p-r'>
-                        <h2 className='header'>Program</h2>
+                        <h2 className='header'>{t("Program")}</h2>
                         <div className='react-select-root' style={{ 'width': 325 }}>
                             <ReactSelect
                                 isSearchable={true}
                                 isClearable={true}
+                                closeMenuOnSelect={false}
                                 isMulti={true}
                                 value={activePrograms}
                                 options={programList}
@@ -132,7 +141,7 @@ export default class OversightDashboard extends Component {
                     </div>
 
                     <button type="submit" className="filter-button btn btn-primary-outline m-r" onClick={this.onSubmit}>
-                        GET RECORDS
+                        {t("GET RECORDS")}
                     </button>
                 </div>
                 {(isLoaderVisible || isProgramCountLoaderVisible) ?
@@ -153,4 +162,4 @@ export default class OversightDashboard extends Component {
     }
 }
 
-
+export default withTranslation()(OversightDashboard);

@@ -15,12 +15,13 @@ class InfoPanel extends Component {
     render() {
 
         let { residentData, residentFilter, rotationSchedule = [],
-            programInfo, width, smallScreen, residentInfo } = this.props;
+            programInfo, width, smallScreen, residentInfo, isUG = false } = this.props;
 
         return (
             <div className='info-panel'>
                 <div className='info-panel-inner'>
-                    {!!residentData && rotationSchedule.length > 0 &&
+                    {/* hide rotation schedules for UG */}
+                    {!!residentData && rotationSchedule.length > 0 && !isUG &&
                         <RotationSchedule residentData={residentData} width={width} rotationSchedule={rotationSchedule} />}
                     {!!residentData &&
                         <EPASpeedInfo
@@ -44,7 +45,8 @@ function mapStateToProps(state) {
     return {
         residentData: state.oracle.residentData,
         programInfo: state.oracle.programInfo,
-        rotationSchedule: state.oracle.rotationSchedule
+        rotationSchedule: state.oracle.rotationSchedule,
+        isUG: state.oracle.isUG
     };
 }
 

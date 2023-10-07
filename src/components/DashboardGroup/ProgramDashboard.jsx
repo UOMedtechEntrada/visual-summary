@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { getAllData, getRotationSchedules } from '../../utils/requestServer';
 import _ from 'lodash';
 import ReactSelect from 'react-select';
@@ -8,8 +9,8 @@ import moment from 'moment';
 import downloadCSV from '../../utils/downloadCSV';
 import { NumberToEPAText } from "../../utils/convertEPA";
 import { possibleAcademicYears } from '../../utils/getAcademicYears';
-
-export default class ProgramDashboard extends Component {
+import { withTranslation } from "react-i18next";
+class ProgramDashboard extends Component {
 
     constructor(props) {
         super(props);
@@ -63,25 +64,32 @@ export default class ProgramDashboard extends Component {
 
     downloadReport = () => {
 
-        const { allResidentRecords = [] } = this.state;
+        const { allResidentRecords = [] } = this.state, { t } = this.props;
 
         if (allResidentRecords.length > 0) {
             downloadCSV([
                 'Academic Year',
                 'Encounter Date',
                 'Expiry Date',
-                'Resident',
+                'Triggered_Date',
+                'Completion_Date',
+                'Learner',
                 'Assessor',
                 'Assessor Role',
                 'EPA',
                 'Rating',
                 'Feedback',
                 'Type',
-                'Progress']
+                'Progress',
+                'Triggered_By',
+                'Assessment_Method',
+            ]
                 , _.map(allResidentRecords, e =>
                 ([e['Academic_Year'] || '',
                 e['Date'] || '',
                 moment(e.Expiry_Date, 'MMM DD, YYYY').format('YYYY-MM-DD'),
+                e['Triggered_Date'] ? moment(e['Triggered_Date'], 'MMM DD, YYYY').format('YYYY-MM-DD') : '',
+                e['Completion_Date'] ? moment(e['Completion_Date'], 'MMM DD, YYYY').format('YYYY-MM-DD') : '',
                 e['Resident_Name'] || '',
                 e['Assessor_Name'] || '',
                 e['Assessor_Role'] || '',
@@ -89,7 +97,9 @@ export default class ProgramDashboard extends Component {
                 e['Rating'] || '',
                 e['Feedback'] || '',
                 e['Type'] || '',
-                e['isExpired'] ? 'expired' : e['progress']
+                e['isExpired'] ? 'expired' : e['progress'],
+                e['Triggered_By'] || '',
+                e['Assessment_Method'] || ''
                 ])),
                 'program-data-report');
         }
@@ -100,13 +110,14 @@ export default class ProgramDashboard extends Component {
     render() {
 
         const { academicYears, allResidentRecords = [] } = this.state,
+            { t } = this.props,
             fullWidth = document.body.getBoundingClientRect().width - 300;
 
         return (
             <div className='dashboard-root-program m-b-lg' >
                 <div className='custom-select-wrapper'>
                     <div className='multi-selection-box m-r'>
-                        <h2 className='header'>Academic Year</h2>
+                        <h2 className='header'>{t("Academic Year")}</h2>
                         <div className='react-select-root'>
                             <ReactSelect
                                 isMulti={true}
@@ -117,7 +128,7 @@ export default class ProgramDashboard extends Component {
                         </div>
                     </div>
                     <button type="submit" className="filter-button btn btn-primary-outline m-r" onClick={this.onSubmit}>
-                        GET RECORDS
+                        {t("GET RECORDS")}
                     </button>
                 </div>
                 {this.state.isLoaderVisible ?
@@ -128,13 +139,16 @@ export default class ProgramDashboard extends Component {
                         {allResidentRecords.length > 0 &&
                             <div>
                                 <div className='text-right m-r-md m-t-md'>
-                                    <button onClick={this.downloadReport} className='btn btn btn-primary-outline'> <i className="fa fa-download"></i> Export Program Data</button>
+                                    <button onClick={this.downloadReport} className='btn btn btn-primary-outline'> <i className="fa fa-download"></i>
+                                        {" " + t("Export Program Data")}
+                                    </button>
                                 </div>
                                 <ProgramAllYearsSummary
                                     width={fullWidth}
                                     allRecords={allResidentRecords}
                                     possibleAcademicYears={_.reverse(academicYears)} />
                                 <ProgramBasePanel
+                                    isUG={this.props.isUG}
                                     width={fullWidth}
                                     allRecords={allResidentRecords}
                                     possibleAcademicYears={_.reverse(academicYears)} />
@@ -146,3 +160,10 @@ export default class ProgramDashboard extends Component {
 }
 
 
+function mapStateToProps(state) {
+    return {
+        isUG: state.oracle.isUG
+    };
+}
+
+export default withTranslation()(connect(mapStateToProps, {})(ProgramDashboard));

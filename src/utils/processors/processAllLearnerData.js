@@ -53,6 +53,10 @@ export default function (dashboard = '', learnersDataDump) {
             Academic_Year: record['academic_year'],
             scale: scale_map[rating.scale_id] || ['Resident Entrustment'],
             progress: record.progress,
+            Triggered_By: record.triggered_by,
+            Assessment_Method: record.assessment_method,
+            Triggered_Date: record.delivery_date,
+            Completion_Date: record.progress == 'complete' ? record.updated_date || record.delivery_date : false,
             Expiry_Date: record.expiry_date,
             isExpired: ((record.progress == 'inprogress') && (moment().isAfter(moment(record.expiry_date, 'MMM DD, YYYY'))))
         };

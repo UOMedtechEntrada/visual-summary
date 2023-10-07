@@ -7,7 +7,8 @@ import {
     FacultyDashboard, ProgramDashboard,
     RotationImport, OversightDashboard
 } from '../components';
-import infoTooltipReference from '../utils/infoTooltipReference';
+import { withTranslation } from "react-i18next";
+
 
 class DashboardRoot extends Component {
 
@@ -24,7 +25,7 @@ class DashboardRoot extends Component {
 
     render() {
 
-        let { activePage = 'resident' } = this.props,
+        let { activePage = 'resident', isUG = false, t } = this.props,
             { dashboard_mode = 'resident', advanced_mode = 'disabled', user_type = 'non-admin' } = dashboard_options;
 
         // Determine if the user has access to multiple programs to show the program oversight dashboard
@@ -35,6 +36,13 @@ class DashboardRoot extends Component {
             showProgramOversight = true;
         }
 
+        let hideScheduleImport = false, residentLabel = t('Resident Dashboard');
+        // for UG change labels and hide rotation schedule import page
+        if (isUG) {
+            hideScheduleImport = true;
+            residentLabel = t('Learner Dashboard');
+        }
+
         return (
             <div className='custom-dashboard-page-root' >
                 <div>
@@ -42,22 +50,19 @@ class DashboardRoot extends Component {
                         <div className='no-printing'>
                             <ul className="dashboard-navigation clearfix">
                                 <li className={activePage == 'resident' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.residentMetrics.main} id='resident-tab' onClick={this.onTabClick} >Resident Metrics</a>
+                                    <a data-tip={t("residentMetrics-main")} id='resident-tab' onClick={this.onTabClick} >{residentLabel}</a>
                                 </li>
                                 <li className={activePage == 'normative' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.normativeAssessment.main} id='normative-tab' onClick={this.onTabClick} >Normative Assessment</a>
+                                    <a data-tip={t("normativeAssessment-main")} id='normative-tab' onClick={this.onTabClick} > {t('Normative Assessment')}</a>
                                 </li>
                                 {advanced_mode == 'enabled' && <li className={activePage == 'supervisor' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.facultyDevlopment.main} id='supervisor-tab' onClick={this.onTabClick} >Faculty Development</a>
+                                    <a data-tip={t("facultyDevlopment-main")} id='supervisor-tab' onClick={this.onTabClick} >{t("Faculty Development")}</a>
                                 </li>}
                                 {advanced_mode == 'enabled' && <li className={activePage == 'program' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.programEvaluation.main} id='program-tab' onClick={this.onTabClick} >Program Evaluation</a>
+                                    <a data-tip={t("programEvaluation-main")} id='program-tab' onClick={this.onTabClick} >{t("Program Evaluation")}</a>
                                 </li>}
                                 {showProgramOversight && <li className={activePage == 'oversight' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.programOversight.main} id='oversight-tab' onClick={this.onTabClick} >Program Oversight</a>
-                                </li>}
-                                {user_type == 'medtech' && <li className={activePage == 'rotation' ? 'active' : ''}>
-                                    <a data-tip={infoTooltipReference.rotationModule.main} id='rotation-tab' onClick={this.onTabClick} > Schedule Import</a>
+                                    <a data-tip={t("programOversight-main")} id='oversight-tab' onClick={this.onTabClick} >{t("Program Oversight")}</a>
                                 </li>}
                             </ul>
                             <div className='clearfix'></div>
@@ -68,7 +73,7 @@ class DashboardRoot extends Component {
                         {(activePage == 'supervisor') && <FacultyDashboard />}
                         {(activePage == 'program') && <ProgramDashboard />}
                         {(activePage == 'oversight') && <OversightDashboard />}
-                        {(activePage == 'rotation') && <RotationImport />}
+                        {/* {(activePage == 'rotation') && <RotationImport />} */}
                     </div>
                 </div>
             </div>
@@ -80,7 +85,8 @@ class DashboardRoot extends Component {
 function mapStateToProps(state) {
     return {
         programInfo: state.oracle.programInfo,
-        activePage: state.oracle.activePage
+        activePage: state.oracle.activePage,
+        isUG: state.oracle.isUG
     };
 }
 
@@ -90,7 +96,7 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardRoot);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(DashboardRoot));
 
 
 

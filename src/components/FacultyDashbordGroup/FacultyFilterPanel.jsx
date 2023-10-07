@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import ReactSelect from 'react-select';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
 import _ from 'lodash';
-export default class FacultyFilterPanel extends Component {
+import { withTranslation } from "react-i18next";
+class FacultyFilterPanel extends Component {
 
     render() {
 
         const { facultyList, facultyGroupList, departmentList,
             currentFaculty, currentFacultyGroup, currentDepartment,
-            onFacultySelect, onCurrentFacultyGroupSelect, onCurrentDepartmentSelect } = this.props;
+            onFacultySelect, onCurrentFacultyGroupSelect, onCurrentDepartmentSelect, t } = this.props;
 
         // Process faculty names so they match the react select format
         const currentFacultyValue = _.find(facultyList, (d) => d.value == currentFaculty) || null;
@@ -22,11 +22,11 @@ export default class FacultyFilterPanel extends Component {
             <div className='filter-panel faculty-filter no-printing'>
                 <div className='text-xs-left advanced-filter-box normative-filter-box'>
                     <div className='react-select-root'>
-                        <label className='filter-label'>Assessor Group
-                            <i data-for='faculty-infotip' data-tip={infoTooltipReference.facultyDevlopment.filterAssessorGroup} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        <label className='filter-label'>{t("Assessor Group")}
+                            <i data-for='faculty-infotip' data-tip={t("facultyDevlopment-filterAssessorGroup")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         </label>
                         <ReactSelect
-                            placeholder='Select Assessor Group...'
+                            placeholder={t("Select Assessor Group...")}
                             isSearchable={true}
                             value={currentFacultyGroupValue}
                             options={facultyGroupList}
@@ -34,11 +34,11 @@ export default class FacultyFilterPanel extends Component {
                             onChange={onCurrentFacultyGroupSelect} />
                     </div>
                     <div className='react-select-root'>
-                        <label className='filter-label'>Department
-                            <i data-for='faculty-infotip' data-tip={infoTooltipReference.facultyDevlopment.filterDepartment} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        <label className='filter-label'>{t("Department")}
+                            <i data-for='faculty-infotip' data-tip={t("facultyDevlopment-filterDepartment")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         </label>
                         <ReactSelect
-                            placeholder='Select Department...'
+                            placeholder={t("Select Department...")}
                             isSearchable={true}
                             value={currentDepartmentValue}
                             options={departmentList}
@@ -46,11 +46,11 @@ export default class FacultyFilterPanel extends Component {
                             onChange={onCurrentDepartmentSelect} />
                     </div>
                     <div className='react-select-root'>
-                        <label className='filter-label'>Assessor
-                            <i data-for='faculty-infotip' data-tip={infoTooltipReference.facultyDevlopment.filterFaculty} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        <label className='filter-label'>{t("Assessor")}
+                            <i data-for='faculty-infotip' data-tip={t("facultyDevlopment-filterFaculty")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         </label>
                         <ReactSelect
-                            placeholder='Select Assessor...'
+                            placeholder={t("Select Assessor...")}
                             isSearchable={true}
                             value={currentFacultyValue}
                             options={facultyList}
@@ -64,3 +64,4 @@ export default class FacultyFilterPanel extends Component {
 
 }
 
+export default withTranslation()(FacultyFilterPanel);

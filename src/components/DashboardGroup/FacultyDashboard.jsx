@@ -9,14 +9,16 @@ import {
 } from '../';
 import { currentAcademicYear, possibleAcademicYears } from '../../utils/getAcademicYears';
 import downloadCSV from '../../utils/downloadCSV';
+import { withTranslation } from "react-i18next";
 
-export default class FacultyDashboard extends Component {
+class FacultyDashboard extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
-            currentFaculty: 'ALL',
-            currentFacultyGroup: 'ALL',
-            currentDepartment: 'ALL',
+            currentFaculty: "ALL",
+            currentFacultyGroup: "ALL",
+            currentDepartment: "ALL",
             facultyList: [],
             facultyGroupList: [],
             departmentList: [],
@@ -50,9 +52,9 @@ export default class FacultyDashboard extends Component {
                     facultyGroupList,
                     departmentList,
                     courseName,
-                    currentFaculty: 'ALL',
-                    currentFacultyGroup: 'ALL',
-                    currentDepartment: 'ALL',
+                    currentFaculty: "ALL",
+                    currentFacultyGroup: "ALL",
+                    currentDepartment: "ALL",
                     isLoaderVisible: false
                 });
             })
@@ -64,9 +66,9 @@ export default class FacultyDashboard extends Component {
                     facultyList: [],
                     facultyGroupList: [],
                     departmentList: [],
-                    currentFaculty: 'ALL',
-                    currentFacultyGroup: 'ALL',
-                    currentDepartment: 'ALL',
+                    currentFaculty: "ALL",
+                    currentFacultyGroup: "ALL",
+                    currentDepartment: "ALL",
                     isLoaderVisible: false
                 });
             });
@@ -84,13 +86,14 @@ export default class FacultyDashboard extends Component {
             if (r.id !== 'visual-summary-content-mount') { jQuery(r).addClass('no-printing') }
         });
 
-        alert('You will be prompted to print the page by your browser. You can also save the report by selecting "Save as PDF" instead.');
+        alert(this.props.t("You will be prompted to print the page by your browser. You can also save the report by selecting 'Save as PDF' instead."));
         window.print();
     }
 
     downloadReport = () => {
 
-        const { allResidentRecords = [], academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state;
+        const { allResidentRecords = [], academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state,
+            { t } = this.props;
 
         const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment),
             relevantData = _.map(processedRecords, d => {
@@ -100,7 +103,7 @@ export default class FacultyDashboard extends Component {
                     overallCount = completedCount + inProgressCount + expiredCount;
                 return [d.faculty_name, overallCount, completedCount, inProgressCount, expiredCount];
             }),
-            csvData = currentFaculty == 'ALL' ? relevantData : _.filter(relevantData, (d) => d[0] == currentFaculty);
+            csvData = currentFaculty == "ALL" ? relevantData : _.filter(relevantData, (d) => d[0] == currentFaculty);
 
         downloadCSV(['Assessor', 'Overall Assessments', 'Completed', 'In progress', 'Expired'], csvData, academicYear.label + '-' + 'assessor-report');
     }
@@ -109,7 +112,8 @@ export default class FacultyDashboard extends Component {
     render() {
 
         const { facultyGroupList = [], facultyList = [], departmentList = [], allResidentRecords = [],
-            courseName, isLoaderVisible, academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state;
+            courseName, isLoaderVisible, academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state,
+            { t } = this.props;
 
         const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment),
             currentFacultyRecords = _.filter(processedRecords, (d) => d.faculty_name == currentFaculty),
@@ -120,7 +124,7 @@ export default class FacultyDashboard extends Component {
         // from the original faculty list
         let facultyWithEnoughRecords = _.map(processedRecords, (d) => d.faculty_name);
         let filteredFacultyList = _.filter(facultyList, (d) => {
-            if (d.value == 'ALL') { return true }
+            if (d.value == "ALL") { return true }
             else { return facultyWithEnoughRecords.indexOf(d.value) > -1 }
         });
 
@@ -128,7 +132,7 @@ export default class FacultyDashboard extends Component {
             <div className='supervisor-dashboard-container'>
                 <div className='custom-select-wrapper no-printing m-b'>
                     <div className='multi-selection-box m-r'>
-                        <h2 className='header'>Academic Year</h2>
+                        <h2 className='header'>{t("Academic Year")}</h2>
                         <div className='react-select-root' style={{ 'width': 150 }}>
                             <ReactSelect
                                 value={academicYear}
@@ -138,7 +142,7 @@ export default class FacultyDashboard extends Component {
                         </div>
                     </div>
                     <button type="submit" className="filter-button btn btn-primary-outline m-r" onClick={this.onSubmit}>
-                        GET RECORDS
+                        {t("GET RECORDS")}
                     </button>
                 </div>
                 {isLoaderVisible ?
@@ -163,13 +167,13 @@ export default class FacultyDashboard extends Component {
                                 <div className='m-a'>
 
                                     <div className='text-right m-r-md m-t-md no-printing'>
-                                        <button onClick={this.downloadReport} className='btn btn btn-primary-outline m-r'> <i className="fa fa-download"></i> Download Assessor Report</button>
-                                        {currentFaculty != 'ALL' && <button onClick={this.printDashboard} className='btn btn btn-primary-outline'> <i className="fa fa-download"></i> Print Assessor Dashboard</button>}
+                                        <button onClick={this.downloadReport} className='btn btn btn-primary-outline m-r'> <i className="fa fa-download"></i> {" " + t("Download Assessor Report")}</button>
+                                        {currentFaculty != "ALL" && <button onClick={this.printDashboard} className='btn btn btn-primary-outline'> <i className="fa fa-download"></i> {" " + t("Print Assessor Dashboard")}</button>}
                                     </div>
 
-                                    <h3 className='print-title text-center'> Faculty Dashboard Report : {courseName}</h3>
-                                    <h3 className='print-title text-center'> Academic Year : {academicYear.label} </h3>
-                                    <h3 className='print-title text-center m-b'> Assessor : {currentFaculty}</h3>
+                                    <h3 className='print-title text-center'> {t("Faculty Dashboard Report")} : {courseName}</h3>
+                                    <h3 className='print-title text-center'> {t("Academic Year")} : {academicYear.label} </h3>
+                                    <h3 className='print-title text-center m-b'> {t("Assessor")} : {currentFaculty}</h3>
 
                                     <FacultyInfoGroup
                                         width={overallWidth}
@@ -199,3 +203,5 @@ export default class FacultyDashboard extends Component {
     }
 
 }
+
+export default withTranslation()(FacultyDashboard);

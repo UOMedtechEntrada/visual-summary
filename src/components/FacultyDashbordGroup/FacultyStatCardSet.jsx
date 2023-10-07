@@ -4,18 +4,23 @@ import FacultyScorePie from './FacultyScorePie';
 import PhaseSummaryPie from './PhaseSummaryPie';
 import ReactTooltip from 'react-tooltip';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
-export default (props) => {
+const phaseList = dashboard_options.dashboard_stages.map((d) => d.target_code);
 
-    const { processedRecords = [], title, showNA = false, tooltipRef, tooltipID } = props;
+export default withTranslation()((props) => {
+
+    const { processedRecords = [], title, showNA = false, tooltipRef, tooltipID, t } = props;
 
     let EPACount = !showNA ? _.sumBy(processedRecords, (d) => d.epa_count) : 'N/A';
+
+    let defaultPhaseArray = _.map(phaseList, e => 0), defaultRatingArray = _.times(window.mostCommonScaleRatings.length, e => 0);
 
     let averageEPAScore = !showNA ? Math.round((_.meanBy(processedRecords, (d) => d.entrustment_score) || 0) * 100) / 100 : 'N/A',
         averageWords = !showNA ? Math.round(_.meanBy(processedRecords, (d) => d.words_per_comment) || 0) : 'N/A',
         averageExpiryRate = !showNA ? Math.round(_.meanBy(processedRecords, (d) => d.expiry_rate) || 0) : 'N/A',
-        ratingGroupSet = !showNA ? _.reduce(processedRecords, (acc, d) => _.map(acc, (inner_d, i) => (inner_d + d.rating_group[i])), [0, 0, 0, 0, 0]) : [],
-        phaseGroupSet = !showNA ? _.reduce(processedRecords, (acc, d) => _.map(acc, (inner_d, i) => (inner_d + d.phase_group[i])), [0, 0, 0, 0]) : [];
+        ratingGroupSet = !showNA ? _.reduce(processedRecords, (acc, d) => _.map(acc, (inner_d, i) => (inner_d + d.rating_group[i])), defaultRatingArray) : [],
+        phaseGroupSet = !showNA ? _.reduce(processedRecords, (acc, d) => _.map(acc, (inner_d, i) => (inner_d + d.phase_group[i])), defaultPhaseArray) : [];
 
     return <div className='faculty-MicroStatCard-group'>
         <div className="hr-divider">
@@ -25,14 +30,13 @@ export default (props) => {
             </h4>
         </div>
         <div className='text-center'>
-            <MicroStatCard style={{ display: 'inline' }} title='Total EPAs observed' type='success' metric={EPACount} />
-            <MicroStatCard style={{ display: 'inline' }} title='Mean EPA Score' type='primary' metric={averageEPAScore} />
-            <MicroStatCard style={{ display: 'inline' }} title='EPA Expiry Rate' type='danger' metric={averageExpiryRate + (averageExpiryRate != 'NA' ? '%' : '')} />
-            <MicroStatCard style={{ display: 'inline' }} title='Mean words per comment' type='info' metric={averageWords} />
+            <MicroStatCard style={{ display: 'inline' }} title={t('Total EPAs observed')} type='success' metric={EPACount} />
+            <MicroStatCard style={{ display: 'inline' }} title={t('Mean EPA Score')} type='primary' metric={averageEPAScore} />
+            <MicroStatCard style={{ display: 'inline' }} title={t('EPA Expiry Rate')} type='danger' metric={averageExpiryRate + (averageExpiryRate != 'NA' ? '%' : '')} />
+            <MicroStatCard style={{ display: 'inline' }} title={t('Mean Words Per Comment')} type='info' metric={averageWords} />
             <FacultyScorePie data={ratingGroupSet} />
             <PhaseSummaryPie data={phaseGroupSet} />
         </div>
         <ReactTooltip id={tooltipID} className='custom-react-tooltip' />
     </div>
-
-}
+});

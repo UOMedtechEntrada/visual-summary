@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
 import processSingleProgramRecords from '../../utils/processors/processSingleProgramRecords';
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
 import _ from 'lodash';
-
-const SCORE_LIST = [{ "scoreID": "1", "label": "1 - I had to do" },
-{ "scoreID": "2", "label": "2 - I had to talk them through" },
-{ "scoreID": "3", "label": "3 - I needed to prompt" },
-{ "scoreID": "4", "label": "4 - I needed to be there just in case" },
-{ "scoreID": "5", "label": "5 - I didn't need to be there" }
-];;
+import { withTranslation } from "react-i18next";
+import getRatingScale from '../../utils/getRatingScale';
 const fivePointColorScale = ["#e15759", "#f28e2c", "#76b7b2", "#4e79a7", "#59a14f"];
-const moddedRatingList = _.map(fivePointColorScale, (d, i) => SCORE_LIST[i].label);
 const monthList = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-
-
-export default class ProgramAllYearSummary extends Component {
+class ProgramAllYearSummary extends Component {
 
     constructor(props) {
         super(props);
@@ -34,24 +25,26 @@ export default class ProgramAllYearSummary extends Component {
     }
 
     render() {
-        const { width, possibleAcademicYears } = this.props,
+        const { width, possibleAcademicYears, t } = this.props,
             { summaryData } = this.state,
             custom_data = _.map(summaryData, (d, yearIndex) => {
                 return {
                     'year': possibleAcademicYears[yearIndex].label,
                     'resident_count': d.resident_count,
                     'rating_group': d.rating_group,
-                    'EPAs Acquired': d.epa_count / (d.resident_count != 0 ? d.resident_count : 1),
-                    'EPAs Expired': d.expired_count / (d.resident_count != 0 ? d.resident_count : 1),
-                    'Average Words Per Comment': d.words_per_comment,
+                    [t('EPAs Acquired')]: d.epa_count / (d.resident_count != 0 ? d.resident_count : 1),
+                    [t('EPAs Expired')]: d.expired_count / (d.resident_count != 0 ? d.resident_count : 1),
+                    [t('Average Words Per Comment')]: d.words_per_comment,
                     'month_count': d.month_count
                 }
             });
 
+        const { colorScale, ratingScale } = getRatingScale(window.mostCommonScaleRatings.length);
+
         const ratingDataList = _.map(custom_data, (d) => {
             const total = _.sum(d.rating_group);
             let dataPoint = { 'year': d.year };
-            _.map(moddedRatingList, (rating, index) => {
+            _.map(ratingScale, (rating, index) => {
                 dataPoint[rating] = total == 0 ? 0 : (d.rating_group[index] / total) * 100;
             });
             return dataPoint;
@@ -70,15 +63,15 @@ export default class ProgramAllYearSummary extends Component {
                 className={'yearall-summary-wrapper m-b'}>
                 <div className="hr-divider">
                     <h4 className="hr-divider-content">
-                        Overall Acquisition Metrics
-                        <i data-for={'overallAcuisitionMetricsYears'} data-tip={infoTooltipReference.programEvaluation.overallAcuisitionMetricsYears} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        {t("Overall Acquisition Metrics")}
+                        <i data-for={'overallAcuisitionMetricsYears'} data-tip={t("programEvaluation-overallAcuisitionMetricsYears")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                     </h4>
                     <ReactTooltip id={'overallAcuisitionMetricsYears'} className='custom-react-tooltip' />
                 </div>
                 <div className='program-part-container p-b'>
                     <h3 className="part-year-title">
-                        EPAs Acquired Per Resident
-                        <i data-for={'EPAsAcquiredAndExpired'} data-tip={infoTooltipReference.programEvaluation.EPAsAcquiredAndExpiredPerResident} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        {t("EPAs Acquired Per Learner")}
+                        <i data-for={'EPAsAcquiredAndExpired'} data-tip={t("programEvaluation-EPAsAcquiredAndExpiredPerResident")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'EPAsAcquiredAndExpired'} className='custom-react-tooltip' />
                     </h3>
                     <div className='chart-container'>
@@ -95,7 +88,7 @@ export default class ProgramAllYearSummary extends Component {
                             <Tooltip labelStyle={{ 'color': 'black' }}
                                 wrapperStyle={{ 'fontWeight': 'bold' }}
                                 formatter={(value, name, props) => {
-                                    if (name == 'EPAs Acquired') {
+                                    if (name == t('EPAs Acquired')) {
                                         return [Math.round(value) + ' per Resident' + " (" + (props.payload.resident_count) + ' Residents)', name];
                                     }
                                     else {
@@ -103,15 +96,15 @@ export default class ProgramAllYearSummary extends Component {
                                     }
                                 }} />
                             <Legend wrapperStyle={{ bottom: 0 }} height={32} />
-                            <Bar dataKey="EPAs Acquired" fill="#82ca9d" />
-                            <Bar dataKey="EPAs Expired" fill="#8884d8" />
+                            <Bar dataKey={t("EPAs Acquired")} fill="#82ca9d" />
+                            <Bar dataKey={t("EPAs Expired")} fill="#8884d8" />
                         </BarChart>
                     </div>
                 </div>
                 <div className='program-part-container p-b'>
                     <h3 className="part-year-title">
-                        EPA Rating Distribution
-                        <i data-for={'EPARatingDistribution'} data-tip={infoTooltipReference.programEvaluation.EPARatingDistribution} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        {t("EPA Rating Distribution")}
+                        <i data-for={'EPARatingDistribution'} data-tip={t("programEvaluation-EPARatingDistribution")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'EPARatingDistribution'} className='custom-react-tooltip' />
                     </h3>
                     <div className='chart-container'>
@@ -126,16 +119,16 @@ export default class ProgramAllYearSummary extends Component {
                             <Tooltip labelStyle={{ 'color': 'black' }} wrapperStyle={{ 'fontWeight': 'bold' }}
                                 formatter={(value, name) => ([(Math.round(value * 10) / 10) + '%', name])} />
                             <Legend wrapperStyle={{ bottom: 0 }} height={32} />
-                            {_.map(moddedRatingList, (rating, index) => {
-                                return <Bar key={'stacked-rating-' + index} stackId='a' dataKey={rating} fill={fivePointColorScale[index]} />
+                            {_.map(ratingScale, (rating, index) => {
+                                return <Bar key={'stacked-rating-' + index} stackId='a' dataKey={rating} fill={colorScale[index]} />
                             })}
                         </BarChart>
                     </div>
                 </div>
                 <div
                     className='program-part-container p-b'>
-                    <h3 className="part-year-title">Monthly Distribution
-                        <i data-for={'EPAMonthlyDistribution'} data-tip={infoTooltipReference.programEvaluation.EPAMonthlyDistribution} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                    <h3 className="part-year-title">{t("Monthly Distribution")}
+                        <i data-for={'EPAMonthlyDistribution'} data-tip={t("programEvaluation-EPAMonthlyDistribution")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'EPAMonthlyDistribution'} className='custom-react-tooltip' />
                     </h3>
                     <div className='chart-container'>
@@ -163,8 +156,8 @@ export default class ProgramAllYearSummary extends Component {
                 <div
                     className='program-part-container p-b'>
                     <h3 className="part-year-title">
-                        Average Words Per Comment
-                        <i data-for={'EPAFeedbackWordCount'} data-tip={infoTooltipReference.programEvaluation.EPAFeedbackWordCount} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        {t("Average Words Per Comment")}
+                        <i data-for={'EPAFeedbackWordCount'} data-tip={t("programEvaluation-EPAFeedbackWordCount")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'EPAFeedbackWordCount'} className='custom-react-tooltip' />
 
                     </h3>
@@ -182,15 +175,14 @@ export default class ProgramAllYearSummary extends Component {
                                 type="category" axisLine={false} dataKey="year" />
                             <Tooltip labelStyle={{ 'color': 'black' }}
                                 wrapperStyle={{ 'fontWeight': 'bold' }} />
-                            <Bar dataKey="Average Words Per Comment" fill="#43b98e" />
+                            <Bar dataKey={t("Average Words Per Comment")} fill="#43b98e" />
                         </BarChart>
                     </div>
                 </div>
-
             </div>
         );
     }
 }
 
-
+export default withTranslation()(ProgramAllYearSummary);
 

@@ -1,18 +1,18 @@
 {
-    "sourceType": "unambiguous",
-    "presets": [
-        [
-            "@babel/preset-env",
-            {
-                "useBuiltIns": "usage", // alternative mode: "entry"
-                "corejs": 3, // default would be 2
-                "targets": "> 0.25%, not dead" //targets all browsers with atleast 0.25% global usage
-            }
-        ],
-        "@babel/preset-react"
-    ],
-    "plugins": [
-        "@babel/plugin-proposal-object-rest-spread",
-        "lodash"
-    ]
+  "sourceType": "unambiguous",
+  "presets": [
+      [
+          "@babel/preset-env",
+          {
+              "useBuiltIns": "usage", // alternative mode: "entry"
+              "corejs": 3, // default would be 2
+              "targets": "> 0.25%, not dead" //targets all browsers with atleast 0.25% global usage
+          }
+      ],
+      "@babel/preset-react"
+  ],
+  "plugins": [
+      "@babel/plugin-proposal-object-rest-spread",
+      "lodash"
+  ]
 }

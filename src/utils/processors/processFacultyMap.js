@@ -1,5 +1,6 @@
 import _ from 'lodash';
-const phaseList = ['D', 'F', 'C', 'P'];
+const phaseList = dashboard_options.dashboard_stages.map((d) => d.target_code);
+window.mostCommonScaleRatings = [];
 
 export default function (allResidentRecords = [], currentFacultyGroup, currentDepartment) {
 
@@ -30,10 +31,18 @@ export default function (allResidentRecords = [], currentFacultyGroup, currentDe
 
         // group records by training phase
         const trainingPhaseGroup = _.groupBy(completedRecords, (d) => d.phaseTag);
+
+        // group the data by rating scale and get the scale that is most common for visualization
+        let mostCommonScaleLength = _.max(_.keys(_.groupBy(allResidentRecordsClone, d => d.scale.length)));
+        if (!mostCommonScaleLength) {
+            mostCommonScaleLength = 5;
+        }
+        let mostCommonScaleRatings = _.times(mostCommonScaleLength, (f) => f + 1);
+        window.mostCommonScaleRatings = mostCommonScaleRatings;
         // group records by rating
         // Also for rating group since we map the data to a 5 point scale
         // we only consider forms with a scale of size 5 and are Supervisor Forms
-        let validScaleRecords = _.filter(completedRecords, (d) => ((d.Type == "Supervisor Form") && (d.scale.length >= 5)));
+        let validScaleRecords = _.filter(completedRecords, (d) => ((d.Type == "Supervisor Form") && (d.scale.length >= mostCommonScaleLength)));
         const ratingGroup = _.groupBy(validScaleRecords, (d) => d.Rating);
 
         let expiry_rate = Math.round((expiredRecords.length / (completedRecords.length + expiredRecords.length)) * 100);
@@ -46,7 +55,7 @@ export default function (allResidentRecords = [], currentFacultyGroup, currentDe
             'records': completedRecords,
             expiredRecords,
             inProgressRecords,
-            rating_group: _.map([1, 2, 3, 4, 5], (d) => (ratingGroup[d] ? ratingGroup[d].length : 0)),
+            rating_group: _.map(mostCommonScaleRatings, (d) => (ratingGroup[d] ? ratingGroup[d].length : 0)),
             phase_group: _.map(phaseList, (d) => (trainingPhaseGroup[d] ? trainingPhaseGroup[d].length : 0)),
             epa_count: completedRecords.length,
             expiry_rate,

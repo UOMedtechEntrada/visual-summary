@@ -2,33 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import { customFilter } from '../../utils/genericUtility';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import { NumberToEPAText } from "../../utils/convertEPA";
 import ReactTooltip from 'react-tooltip';
 import moment from 'moment';
 import _ from 'lodash';
-
-const columns = [{
-    Header: 'Encounter Date',
-    accessor: 'Date',
-    className: 'text-center',
-    filterMethod: customFilter
-}, {
-    Header: 'Expiry Date',
-    accessor: 'Expiry_Date',
-    className: 'text-center',
-    filterMethod: customFilter
-}, {
-    Header: 'EPA',
-    accessor: 'EPA',
-    filterMethod: customFilter
-},
-{
-    Header: 'Assessor Name',
-    accessor: 'Assessor_Name',
-    className: 'text-center',
-    filterMethod: customFilter
-}];
+import { withTranslation } from "react-i18next";
 
 class ExpiredResidentData extends Component {
 
@@ -37,17 +15,37 @@ class ExpiredResidentData extends Component {
         this.state = {
             isVisible: false
         };
-        this.toggleVisibility = this.toggleVisibility.bind(this);
     }
 
-    toggleVisibility(event) {
+    toggleVisibility = (event) => {
         event.preventDefault();
         this.setState({ isVisible: !this.state.isVisible });
     }
 
     render() {
 
-        let { expiredResidentData = [], smallScreen = false } = this.props;
+        let { expiredResidentData = [], smallScreen = false, t } = this.props;
+
+        const columns = [{
+            Header: t("Encounter Date"),
+            accessor: 'Date',
+            className: 'text-center',
+            filterMethod: customFilter
+        }, {
+            Header: t("Expiry Date"),
+            accessor: 'Expiry_Date',
+            className: 'text-center',
+            filterMethod: customFilter
+        }, {
+            Header: t("EPA"),
+            accessor: 'EPA',
+            filterMethod: customFilter
+        }, {
+            Header: t("Assessor Name"),
+            accessor: 'Assessor_Name',
+            className: 'text-center',
+            filterMethod: customFilter
+        }];
 
         return (
             <div className='expired-box' >
@@ -55,8 +53,8 @@ class ExpiredResidentData extends Component {
                     <div>
                         <h4 onClick={this.toggleVisibility} className="text-left">
                             {this.state.isVisible ? <span className="fa fa-chevron-down"></span> : <span className="fa fa-chevron-right"></span>}
-                            View Expired EPAs
-                            <i data-for='expired-infotip' data-tip={infoTooltipReference.residentMetrics.viewExpiredEPAs} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                            {t("View Expired EPAs")}
+                            <i data-for='expired-infotip' data-tip={t("residentMetrics-viewExpiredEPAs")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                             <ReactTooltip id='expired-infotip' className='custom-react-tooltip' />
                         </h4>
                         <div className={'table-box ' + (this.state.isVisible ? '' : 'hidden-table-box')}>
@@ -66,6 +64,8 @@ class ExpiredResidentData extends Component {
                                 defaultPageSize={10}
                                 resizable={false}
                                 filterable={true}
+                                previousText={t('Previous')}
+                                nextText={t('Next')}
                                 className='-highlight'
                                 defaultSorted={[{ id: "Date", desc: true }]} />
                         </div>
@@ -81,5 +81,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, null)(ExpiredResidentData);
+export default withTranslation()(connect(mapStateToProps, null)(ExpiredResidentData));
 

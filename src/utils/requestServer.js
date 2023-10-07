@@ -40,7 +40,7 @@ export function getAssessmentCountByProgram(params) {
     });
 }
 
-// Get all assessments of a single learner/resident
+// Get all assessments of a single learner
 export function getLearnerData(username, residentInfo) {
     return new Promise((resolve, reject) => {
         let get_learner_data = jQuery.ajax({

@@ -6,9 +6,9 @@ import ScheduleBlock from './ScheduleBlock';
 import MonthLayer from './MonthLayer';
 import { showRotationTooltip, updateResidentData, setResidentFilter } from '../../../redux/actions/actions';
 import RotationTooltip from './RotationTooltip';
-import infoTooltipReference from '../../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 class RotatioSchedule extends Component {
 
     constructor(props) {
@@ -72,7 +72,7 @@ class RotatioSchedule extends Component {
     render() {
 
         const { residentData = {}, width, rotationSchedule = [],
-            isRotationTooltipVisible, rotationTooltipData, residentFilter } = this.props,
+            isRotationTooltipVisible, rotationTooltipData, residentFilter, t } = this.props,
             { isHistoryVisible, isEPAperBlockVisible, activeScheduleBlock } = this.state;
 
         //200px to offset the margin on both sides and vertical scroll bar width
@@ -106,15 +106,15 @@ class RotatioSchedule extends Component {
         return (
             <div className='schedule-box text-center hidden-xs'>
                 <div className="hr-divider">
-                    <h4 className="hr-divider-content"> ROTATION SCHEDULE 
-                        <i data-for='rotation-infotip' data-tip={infoTooltipReference.residentMetrics.rotationSchedule} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                    <h4 className="hr-divider-content"> ROTATION SCHEDULE
+                        <i data-for='rotation-infotip' data-tip={t("residentMetrics-rotationSchedule")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                     </h4>
                     <ReactTooltip className='custom-react-tooltip' id='rotation-infotip' />
                 </div>
                 <div className='button-wrapper'>
                     <button
                         data-for='rotation-buttontip'
-                        data-tip={infoTooltipReference.residentMetrics.viewHistory}
+                        data-tip={t("residentMetrics-viewHistory")}
                         onClick={this.showHistorySchedule}
                         className={'view-back-button btn btn-primary-outline' + (isHistoryVisible ? ' selected' : '')}>
                         <span className="fa fa-history"></span>
@@ -122,7 +122,7 @@ class RotatioSchedule extends Component {
                     </button>
                     <button
                         data-for='rotation-buttontip'
-                        data-tip={infoTooltipReference.residentMetrics.viewEPAsBlock}
+                        data-tip={t("residentMetrics-viewEPAsBlock")}
                         onClick={this.showEPAsPerBlock}
                         className={'view-back-button per-block-button btn btn-primary-outline' + (isEPAperBlockVisible ? ' selected' : '')}>
                         <span className="fa fa-database"></span>
@@ -183,4 +183,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RotatioSchedule);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(RotatioSchedule));

@@ -4,33 +4,36 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { switchToResidentDashboard } from '../../redux/actions/actions';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
-const columns = [{
-    Header: 'Name',
-    accessor: 'fullname',
-    className: 'text-left',
-    maxWidth: 150
-},
-{
-    Header: 'Total',
-    accessor: 'totalAssessments',
-    className: 'text-center',
-    maxWidth: 75
-},
-{
-    Header: 'Achieved',
-    accessor: 'completedAssessments',
-    className: 'text-center',
-    maxWidth: 100
-},
-{
-    Header: 'Achievement(%)',
-    accessor: 'achievementRate',
-    className: 'text-center',
-    maxWidth: 130
-}];
+
 
 let NormativeTable = (props) => {
+
+    const columns = [{
+        Header: props.t('Name'),
+        accessor: 'fullname',
+        className: 'text-left',
+        maxWidth: 150
+    },
+    {
+        Header: props.t('Total'),
+        accessor: 'totalAssessments',
+        className: 'text-center',
+        maxWidth: 75
+    },
+    {
+        Header: props.t('Achieved'),
+        accessor: 'completedAssessments',
+        className: 'text-center',
+        maxWidth: 100
+    },
+    {
+        Header: props.t('Achievement(%)'),
+        accessor: 'achievementRate',
+        className: 'text-center',
+        maxWidth: 130
+    }];
 
     // For small screens the table spans the entire width so dont set any maxwidth 
     const moddedColumns = _.map(columns, (column) => {
@@ -46,6 +49,8 @@ let NormativeTable = (props) => {
                 defaultPageSize={10}
                 resizable={false}
                 className='-highlight'
+                previousText={props.t('Previous')}
+                nextText={props.t('Next')}
                 getTdProps={(state, rowInfo, column, instance) => {
                     return {
                         onClick: (e, handleOriginal) => {
@@ -85,5 +90,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NormativeTable);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(NormativeTable));
 

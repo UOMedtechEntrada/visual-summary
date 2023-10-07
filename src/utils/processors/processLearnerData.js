@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { EPATextToNumber } from '../convertEPA';
+import { decodeHtmlEntity } from '../genericUtility';
+
 export default function (username, residentInfo, learnerDataDump) {
 
     let { dashboard_epas = [], rating_scale_map = [],
@@ -15,11 +17,13 @@ export default function (username, residentInfo, learnerDataDump) {
 
     // process the rating scale map
     // records come tagged with descriptor ID, we need to group the ratings by scale ID and then rate them by order.
-    let scale_map = _.groupBy(rating_scale_map, (d) => d.scale_id);
+    let scale_map = _.groupBy(rating_scale_map, (d) => d.scale_id), scale_title_map = {};
     // Order the ratings in a single scale so that they are in order based on the order tag
     _.map(scale_map, (scale, scale_id) => {
         scale_map[scale_id] = _.map(_.sortBy(scale, d => d.order), (e) => e.text);
+        scale_title_map[scale_id] = scale[0].rating_scale_title;
     });
+
 
     // This info is used in the GraphRow.jsx component
     window.dynamicDashboard.contextual_variable_map = _.groupBy(contextual_variables_map, (d) => d.form_id);
@@ -61,6 +65,7 @@ export default function (username, residentInfo, learnerDataDump) {
             formTitle: record.title,
             Academic_Year: getAcademicYear(moment(record.encounter_date, 'MMM DD, YYYY').format('YYYY-MM-DD')),
             scale: scale_map[rating.scale_id] || ['Resident Entrustment'],
+            scaleTitle: scale_title_map[rating.scale_id] || ['No Matching Scale'],
             progress: record.progress,
             Expiry_Date: record.expiry_date,
             isExpired: ((record.progress == 'inprogress') && (moment().isAfter(moment(record.expiry_date, 'MMM DD, YYYY'))))
@@ -76,7 +81,7 @@ export default function (username, residentInfo, learnerDataDump) {
         expiredData = _.filter(assessmentDataGroup['inprogress'], d => d.isExpired);
 
     // process the rotation schedule data 
-    var rotationSchedule = processRotationSchedule(rotation_schedule);
+    var rotationSchedule = processRotationSchedule(rotation_schedule, course_name);
 
     return { programInfo, residentData, rotationSchedule, expiredData };
 }
@@ -85,11 +90,12 @@ export default function (username, residentInfo, learnerDataDump) {
 let getAssessorType = (group = '', role = '') => (group == role) ? group : group + ' (' + role + ')';
 
 function getProgramInfo(epa_list, epaProgress, course_name) {
-
-    let defaultSourceMap = {
-        1: {
-            'ID': 'TTD',
-            'topic': 'Transition to Discipline (D)',
+    let defaultSourceMap = {};
+    // Loop over every training stage and for each stage create an empty reference map
+    _.map(dashboard_options.dashboard_stages, (training_stage, training_stage_index) => {
+        defaultSourceMap[training_stage_index + 1] = {
+            'ID': training_stage.target_code,
+            'topic': training_stage.target_label,
             subRoot: {},
             maxObservation: {},
             observed: {},
@@ -98,44 +104,8 @@ function getProgramInfo(epa_list, epaProgress, course_name) {
             objectiveID: {},
             assessmentInfo: {},
             filterValuesDict: {}
-        },
-        2: {
-            'ID': 'F',
-            'topic': 'Foundations of Discipline (F)',
-            subRoot: {},
-            maxObservation: {},
-            observed: {},
-            completed: {},
-            achieved: {},
-            objectiveID: {},
-            assessmentInfo: {},
-            filterValuesDict: {}
-        },
-        3: {
-            'ID': 'CORE',
-            'topic': 'Core of Discipline (C)',
-            subRoot: {},
-            maxObservation: {},
-            observed: {},
-            completed: {},
-            achieved: {},
-            objectiveID: {},
-            assessmentInfo: {},
-            filterValuesDict: {}
-        },
-        4: {
-            'ID': 'TP',
-            'topic': 'Transition to Practice (P)',
-            subRoot: {},
-            maxObservation: {},
-            observed: {},
-            completed: {},
-            achieved: {},
-            objectiveID: {},
-            assessmentInfo: {},
-            filterValuesDict: {}
-        },
-    };
+        }
+    });
 
     // Map over each EPA and append it to its corresponding entry in the sourcemap 
     _.map(epa_list, (epa) => {
@@ -154,18 +124,40 @@ function getProgramInfo(epa_list, epaProgress, course_name) {
             matchingEPA = {};
         }
 
-        // set the EPA label
-        defaultSourceMap[EPAID[0]].subRoot[EPAID] = getEPATitle(epa.target_title);
-        // set the EPA required observation count 
-        defaultSourceMap[EPAID[0]].maxObservation[EPAID] = matchingEPA.total_assessments_required || 0;
-        // set the EPA achieved count 
-        defaultSourceMap[EPAID[0]].observed[EPAID] = matchingEPA.total_assessment_attempts || 0;
-        // set the observed count 
-        defaultSourceMap[EPAID[0]].achieved[EPAID] = matchingEPA.total_requirement_met_assessments || 0;
-        // set the completed flag 
-        defaultSourceMap[EPAID[0]].completed[EPAID] = matchingEPA.completed || false;
-        // set the EPA objective ID 
-        defaultSourceMap[EPAID[0]].objectiveID[EPAID] = matchingEPA.objective_id || false;
+        try {
+
+            // If a training stage is not available then create one
+            if (!defaultSourceMap[EPAID[0]]) {
+                defaultSourceMap[EPAID[0]] = {
+                    'ID': EPAID[0],
+                    'topic': EPAID[0] + " UNMAPPED",
+                    subRoot: {},
+                    maxObservation: {},
+                    observed: {},
+                    completed: {},
+                    achieved: {},
+                    objectiveID: {},
+                    assessmentInfo: {},
+                    filterValuesDict: {}
+                }
+            }
+
+            // set the EPA label
+            defaultSourceMap[EPAID[0]].subRoot[EPAID] = decodeHtmlEntity(getEPATitle(epa.target_title));
+            // set the EPA required observation count 
+            defaultSourceMap[EPAID[0]].maxObservation[EPAID] = matchingEPA.total_assessments_required || 0;
+            // set the EPA achieved count 
+            defaultSourceMap[EPAID[0]].observed[EPAID] = matchingEPA.total_assessment_attempts || 0;
+            // set the observed count 
+            defaultSourceMap[EPAID[0]].achieved[EPAID] = matchingEPA.total_requirement_met_assessments || 0;
+            // set the completed flag 
+            defaultSourceMap[EPAID[0]].completed[EPAID] = matchingEPA.completed || false;
+            // set the EPA objective ID 
+            defaultSourceMap[EPAID[0]].objectiveID[EPAID] = matchingEPA.objective_id || false;
+
+        } catch (error) {
+            console.log(error);
+        }
     });
 
     return {
@@ -182,7 +174,7 @@ function recordEPAtoNumber(record) {
     if (record.mapped_epas.length > 0) {
         return EPATextToNumber(record.mapped_epas[0].objective_code || '');
     }
-    else if (record.form_type == 'Supervisor Form') {
+    else if (record.form_type == 'Supervisor Form' && record.title.indexOf('-') > -1) {
         return EPATextToNumber(record.title.split('-')[1].trim());
     }
     else { return 'unmapped' };
@@ -219,8 +211,13 @@ function processComments(record) {
 }
 
 
-function processRotationSchedule(rotationList) {
-    return rotationList.map((r, rotationID) => ({
+function processRotationSchedule(rotationList, courseName) {
+
+    // Filter rotation schedules that are set by the course schedule group
+    // and ignore other schedule groups. 
+    let releventRotationScheduleList = _.filter(rotationList, s => courseName.indexOf(s.schedule_group) > -1);
+
+    return releventRotationScheduleList.map((r, rotationID) => ({
         ...r,
         'start_date': moment(r.start_date, 'YYYY-MM-DD'),
         'end_date': moment(r.end_date, 'YYYY-MM-DD'),

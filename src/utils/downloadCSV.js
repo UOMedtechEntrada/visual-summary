@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import FileSaver from 'file-saver';
 
-export default function (columnNames = ['Date', 'Resident Name', 'EPA', 'Observer Name', 'Observer Type', 'Rating', 'Type', 'Situation Context', 'Feedback', 'Professionalism Safety', 'EPA Expired'],
+export default function (columnNames = ['Date', 'Learner Name', 'EPA', 'Observer Name', 'Observer Type', 'Rating', 'Type', 'Situation Context', 'Feedback', 'Professionalism Safety', 'EPA Expired'],
     data = [], fileName = 'visual-summary-export') {
     // Escaping strings in quotes to evade fuckery because of
     // commas within the strings that can cause the csv file 

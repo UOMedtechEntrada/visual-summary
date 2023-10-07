@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import ReactSelect from 'react-select';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
 const ScheduleClassifications = [
     { 'value': 'rotationTag', 'label': 'Rotation Name' },
@@ -11,7 +11,7 @@ const ScheduleClassifications = [
     { 'value': 'siteTag', 'label': 'Site' }
 ];
 
-export default class EPAOverallbyRotation extends Component {
+class EPAOverallbyRotation extends Component {
 
     constructor(props) {
         super(props);
@@ -25,7 +25,7 @@ export default class EPAOverallbyRotation extends Component {
 
     render() {
         const { printModeON,
-            allRecords, normalizeByCount = false, width } = this.props,
+            allRecords, normalizeByCount = false, width, t } = this.props,
             { classificationCriteria } = this.state;
 
         let recordsFilteredByGroup = _.filter(allRecords, (d) => d.scheduleTag.indexOf('No Schedule Available') == -1);
@@ -55,12 +55,12 @@ export default class EPAOverallbyRotation extends Component {
             <div className='text-left'>
                 <h3 className='text-left'>
                     {normalizeByCount ? 'EPAs per Rotation' : 'EPA Rotation Distribution'}
-                    <i data-for={'rotationDist'} data-tip={infoTooltipReference.programEvaluation.rotationDist} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                    <i data-for={'rotationDist'} data-tip={t("programEvaluation-rotationDist")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                     <ReactTooltip id={'rotationDist'} className='custom-react-tooltip' />
                 </h3>
                 <div className='react-select-root'>
                     <label className='filter-label'> Rotation Classification
-                        <i data-for='rotationClassification' data-tip={infoTooltipReference.programEvaluation.rotationClassification} className="fa fa-info-circle instant-tooltip-trigger"></i>
+                        <i data-for='rotationClassification' data-tip={t("programEvaluation-rotationClassification")} className="fa fa-info-circle instant-tooltip-trigger"></i>
                         <ReactTooltip id={'rotationClassification'} className='custom-react-tooltip' />
                     </label>
                     <ReactSelect
@@ -93,3 +93,5 @@ export default class EPAOverallbyRotation extends Component {
         </div>)
     };
 };
+
+export default withTranslation()(EPAOverallbyRotation);

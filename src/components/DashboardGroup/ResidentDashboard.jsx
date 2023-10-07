@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FilterPanel, GraphPanel, InfoPanel, ExpiredRecordTable } from '../';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 class ResidentDashboard extends Component {
 
     constructor(props) {
         super(props);
     }
-
+  
     render() {
 
-        const { residentList = [], residentData, dashboard_mode, residentFilter } = this.props,
+        const { residentList = [], residentData, dashboard_mode, residentFilter, t } = this.props,
             width = window.dynamicDashboard.mountWidth,
             smallScreen = width < 600;
 
@@ -43,10 +44,10 @@ class ResidentDashboard extends Component {
                                         smallScreen={smallScreen} />
                                 </div> :
                                 <h3 className='text-primary text-center m-t-lg'>
-                                    Sorry the selected resident has no observed EPAs.
+                                    {t("Sorry the selected learner has no observed EPAs.")}
                                 </h3>}
                         </div> :
-                        <h3 className='text-center text-primary'>Sorry resident data is not available currently.</h3>}
+                        <h3 className='text-center text-primary'>{t("Sorry learner data is not available currently.")}</h3>}
                 </div>
             </div >
         );
@@ -61,7 +62,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {})(ResidentDashboard);
+export default withTranslation()(connect(mapStateToProps, {})(ResidentDashboard));
 
 
 

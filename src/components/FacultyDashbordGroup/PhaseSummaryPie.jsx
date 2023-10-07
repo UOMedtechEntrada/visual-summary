@@ -3,9 +3,11 @@ import { pie, arc } from "d3-shape";
 import { scaleOrdinal } from 'd3-scale';
 import { format } from "d3-format";
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
-const fourPointColorScale = ["#f28e2c", "#76b7b2", "#4e79a7", "#59a14f"];
-const phaseMiniLabelList = ['D', 'F', 'C', 'P'];
+const ten_color_scale = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"];
+const phaseMiniLabelList = dashboard_options.dashboard_stages.map((d) => d.target_code),
+    colorScale = ten_color_scale.slice(0, phaseMiniLabelList.length);
 
 const innerRadius = 25, outerRadius = 50;
 
@@ -33,12 +35,12 @@ const Pie = props => {
 
     const formatter = format(".2f");
     const data = createPie(pieData);
-    const colors = scaleOrdinal(fourPointColorScale);
+    const colors = scaleOrdinal(colorScale);
     const showNA = pieData.length == 0 || _.sum(pieData) == 0;
 
     return (
         <div className={'faculty-pie-wrapper ' + (showNA ? 'p-a' : '')}>
-            <span className="pie-title">TRAINING STAGE</span>
+            <span className="pie-title">{props.t("TRAINING STAGE")}</span>
             {showNA ?
                 <h2 className="statcard-number m-a"> N/A</h2> :
                 <svg width={150} height={100}>
@@ -55,7 +57,7 @@ const Pie = props => {
                         ))}
                     </g>
                     <g transform='translate(28 -1)'>
-                        {_.map(fourPointColorScale, (c, i) => {
+                        {_.map(colorScale, (c, i) => {
                             return <g key={'epa-pie-label-' + i}>
                                 <circle style={{ 'cursor': 'pointer' }} fill={c} r={12} cx={100} cy={23 * i + 15}>
                                     <title>{pieData[i] + "%"}</title>
@@ -73,4 +75,4 @@ const Pie = props => {
     );
 };
 
-export default Pie;
+export default withTranslation()(Pie);

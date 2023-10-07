@@ -3,8 +3,9 @@ import BulletChart from './BulletChart';
 import FormWrapper from './FormWrapper';
 import { NumberToEPAText } from "../../../utils/convertEPA";
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
 
-export default class GraphRow extends Component {
+class GraphRow extends Component {
 
     constructor(props) {
         super(props);
@@ -24,7 +25,7 @@ export default class GraphRow extends Component {
 
     render() {
 
-        let { epaSource, widthPartition, smallScreen, epaSourceMap, residentEPAData } = this.props;
+        let { epaSource, widthPartition, smallScreen, epaSourceMap, residentEPAData, t } = this.props;
 
         //  margin of 20px on either side reduces the available width by 40 
         // 15px bullet chart padding on either sides
@@ -90,19 +91,19 @@ export default class GraphRow extends Component {
                             </div> :
                             <div className='graph-card first-card'>
                                 {(maxObservation != 0) && <span className='card-text'>{remainingCount}</span>}
-                                {(maxObservation != 0) && <span className='card-title remaining-title'>TO GO</span>}
+                                {(maxObservation != 0) && <span className='card-title remaining-title'>{t("To go")}</span>}
                             </div>}
                         <div className='graph-card'>
                             <span className='card-text'>{recordedCount}</span>
-                            <span className='card-title recorded-title'>OBSERVED</span>
+                            <span className='card-title recorded-title'>{t("Observed")}</span>
                         </div>
                         <div className='graph-card'>
                             <span className='card-text'>{maxObservation == 0 ? 'N/A' : maxObservation}</span>
-                            <span className='card-title required-title'>REQUIRED</span>
+                            <span className='card-title required-title'>{t("Required")}</span>
                         </div>
                         <div className='graph-card '>
                             <span className='card-text'>{maxObservation == 0 ? 'N/A' : achievedCount}</span>
-                            <span className='card-title achieved-title'>ACHIEVED</span>
+                            <span className='card-title achieved-title'>{t("Achieved")}</span>
                         </div>
                     </div>
                 </div>
@@ -128,3 +129,5 @@ export default class GraphRow extends Component {
         );
     }
 }
+
+export default withTranslation()(GraphRow);

@@ -4,12 +4,30 @@ import { Dashboard } from './pages';
 import { Container } from './components';
 import configureStore from './redux/store/configureStore';
 import { Provider } from 'react-redux';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 // Import and Initialize react-dates at the top of the app for use anywhere within
 import 'react-dates/initialize';
+// Import Language files 
+import en from '../language/en';
+import fr from '../language/fr';
 //Root sass file for webpack to compile
 import './sass/main.scss';
 import 'react-dates/lib/css/_datepicker.css';
 import './utils/css/toolkit-light.scss';
+
+// Initialize language locale
+i18n
+  .use(initReactI18next) // passes i18n down to react-i18next
+  .init({
+    resources: { en, fr },
+    lng: dashboard_options.current_locale || "en",
+    fallbackLng: "en",
+    interpolation: {
+      escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+    }
+  });
+
 
 //Initial Default settings 
 const store = configureStore();

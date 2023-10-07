@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import FacultyGraph from './FacultyGraph';
-import infoTooltipReference from '../../utils/infoTooltipReference';
 import _ from 'lodash';
-export default class FacultyGraphGroup extends Component {
+import { withTranslation } from "react-i18next";
+class FacultyGraphGroup extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
 
-        const { width, processedRecords, selectFaculty, currentFaculty } = this.props;
+        const { width, processedRecords, selectFaculty, currentFaculty, t } = this.props;
 
         // format the data into the required format for a graph component
         const data_epa_count = _.map(processedRecords, (d) => [d.faculty_name, d.epa_count]);
@@ -26,9 +26,9 @@ export default class FacultyGraphGroup extends Component {
         return (<div>
             {processedRecords.length > 0 && <div className='text-center'>
                 <FacultyGraph
-                    tooltipRef={infoTooltipReference.facultyDevlopment.totalEPAsObserved}
+                    tooltipRef={t("facultyDevlopment-totalEPAsObserved")}
                     tooltipID={'faculty-epacount-infotip'}
-                    title={'Total EPAs Observed '}
+                    title={t('Total EPAs Observed')}
                     titleValue={!!currentFacultyData ? currentFacultyData.epa_count : ''}
                     currentFaculty={currentFaculty}
                     trackType={'epa_count'}
@@ -36,9 +36,9 @@ export default class FacultyGraphGroup extends Component {
                     selectFaculty={selectFaculty}
                     width={(width / 2) - 50} />
                 <FacultyGraph
-                    tooltipRef={infoTooltipReference.facultyDevlopment.EPAExpiryRate}
+                    tooltipRef={t("facultyDevlopment-EPAExpiryRate")}
                     tooltipID={'faculty-expired-rate-infotip'}
-                    title={'EPA Expiry Rate'}
+                    title={t("EPA Expiry Rate")}
                     titleValue={!!currentFacultyData ? currentFacultyData.expiry_rate : ''}
                     currentFaculty={currentFaculty}
                     trackType={'expiry_rate'}
@@ -46,9 +46,9 @@ export default class FacultyGraphGroup extends Component {
                     selectFaculty={selectFaculty}
                     width={(width / 2) - 50} />
                 <FacultyGraph
-                    tooltipRef={infoTooltipReference.facultyDevlopment.averageEntrustmentScore}
+                    tooltipRef={t("facultyDevlopment-averageEntrustmentScore")}
                     tooltipID={'faculty-epascore-infotip'}
-                    title={'Average Entrustment Score '}
+                    title={t("Average Entrustment Score")}
                     titleValue={!!currentFacultyData ? currentFacultyData.entrustment_score : ''}
                     currentFaculty={currentFaculty}
                     trackType={'entrustment_score'}
@@ -56,9 +56,9 @@ export default class FacultyGraphGroup extends Component {
                     selectFaculty={selectFaculty}
                     width={(width / 2) - 50} />
                 <FacultyGraph
-                    tooltipRef={infoTooltipReference.facultyDevlopment.averageWordsPerComment}
+                    tooltipRef={t("facultyDevlopment-averageWordsPerComment")}
                     tooltipID={'faculty-comment-infotip'}
-                    title={'Average Words Per Comment '}
+                    title={t("Average Words Per Comment")}
                     titleValue={!!currentFacultyData ? currentFacultyData.words_per_comment : ''}
                     currentFaculty={currentFaculty}
                     trackType={'words_per_comment'}
@@ -69,8 +69,7 @@ export default class FacultyGraphGroup extends Component {
         </div>
 
         );
-
-
     }
-
 }
+
+export default withTranslation()(FacultyGraphGroup);

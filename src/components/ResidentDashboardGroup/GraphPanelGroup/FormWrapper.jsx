@@ -3,11 +3,13 @@ import LineChart from './LineChart';
 import { scaleLinear } from 'd3-scale';
 import SlideInTable from './SlideInTable';
 import SlideInFilter from './SlideInFilter';
-import oScoreReference from "../../../utils/oScoreReference";
-import infoTooltipReference from '../../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
 import _ from 'lodash';
-export default class GraphRow extends Component {
+import { withTranslation } from "react-i18next";
+
+const defaultOScoreReference = ['I had to do', 'I had to talk them through', 'I needed to prompt', 'I needed to be there just in case', 'I did not need to be there'];
+
+class GraphRow extends Component {
 
     constructor(props) {
         super(props);
@@ -31,7 +33,7 @@ export default class GraphRow extends Component {
 
         let { epaSource, widthPartition, smallScreen, formID, openFilterID, openTableID,
             residentEPAData, formTitle = '', onMouseOut, onMouseOver, onInfoClick,
-            onTableExpandClick, onFilterExpandClick } = this.props;
+            onTableExpandClick, onFilterExpandClick, t } = this.props;
 
         // margin of 10px on either side reduces the available width by 20
         let marginVertical = 20, marginHorizontal = 20,
@@ -44,7 +46,7 @@ export default class GraphRow extends Component {
             isTableVisible = openTableID == epaIDClass.slice(4);
 
         // Get the record rating scale
-        let scoreScale = residentEPAData.length > 0 ? residentEPAData[0].scale : oScoreReference;
+        let scoreScale = residentEPAData.length > 0 ? residentEPAData[0].scale : defaultOScoreReference;
 
         const xScale = scaleLinear().domain([0, residentEPAData.length - 1]).range([marginHorizontal + 20, width - marginHorizontal])
         const yScale = scaleLinear().domain([scoreScale.length, 1]).range([marginVertical, innerHeight - marginVertical])
@@ -120,17 +122,17 @@ export default class GraphRow extends Component {
                     onMouseOver={onMouseOver}
                     onMouseOut={onMouseOut} />
                 {!smallScreen &&
-                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={infoTooltipReference.residentMetrics.showEPATable}
+                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={t("residentMetrics-showEPATable")}
                         className={"table-icon fa fa-custom fa-book " + epaIDClass + (isTableVisible ? ' open-table' : ' ')} onClick={onTableExpandClick}>
                     </span>
                 }
                 {!smallScreen && isAnyFilterAvailable &&
-                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={infoTooltipReference.residentMetrics.showEPAFilter}
+                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={t("residentMetrics-showEPAFilter")}
                         className={"fa fa-custom filter-icon fa-sliders " + epaIDClass + (isFilterVisible ? ' open-filter' : ' ')} onClick={onFilterExpandClick}>
                     </span>
                 }
                 {!smallScreen &&
-                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={infoTooltipReference.residentMetrics.showObjectiveBreakdown}
+                    <span data-for={'epa-buttontip-' + epaIDClass} data-tip={t("residentMetrics-showObjectiveBreakdown")}
                         id={'info-' + epaIDClass} className={"fa fa-custom info-icon fa-info-circle " + epaIDClass} onClick={onInfoClick}>
                     </span>
                 }
@@ -152,6 +154,8 @@ export default class GraphRow extends Component {
         );
     }
 }
+
+export default withTranslation()(GraphRow);
 
 // This takes in values that are in contextual variable map format
 // of elentra and converts them into a more easily consumable form needed for the dashboard

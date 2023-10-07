@@ -4,6 +4,7 @@ export default {
     filterLoaderState: false,
     activePage: dashboard_options.dashboard_mode == 'resident' ? 'resident' : 'normative',
     userType: dashboard_options.user_type == 'medtech' ? 'medtech' : 'non-admin',
+    isUG: dashboard_options.active_organisation.toLowerCase().indexOf('undergraduate') > -1 || dashboard_options.active_organisation.toLowerCase().indexOf('ug') > -1,
     residentData: null,
     expiredData: null,
     rotationSchedule: [],

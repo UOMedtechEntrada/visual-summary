@@ -1,5 +1,4 @@
 .filter-panel {
-
     &.smaller-wrapper {
         margin-bottom: -25px !important;
         margin-top: -15px !important;
@@ -34,6 +33,7 @@
     }
     .filter-button-container {
         display: inline-block;
+
         .btn-primary-outline.active-button {
             color: #ffffff;
             background-color: steelblue;
@@ -131,6 +131,9 @@
         }
     }
     .filter-button {
+        max-width: 165px;
+        white-space: normal;
+
         .filter-loader {
             margin-left: 10px;
             display: inline-block;
@@ -141,4 +144,3 @@
         }
     }
 }
-

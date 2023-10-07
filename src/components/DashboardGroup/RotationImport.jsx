@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ReactSelect from 'react-select';
-import FileUpload from './FileUpload';
+import FileUpload from '../ReusableComponents/FileUpload';
 import getFile from '../../utils/getFile';
 import processOne45File from '../../utils/processors/processOne45File';
 import { setRotationSchedules } from '../../utils/requestServer';

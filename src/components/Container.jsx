@@ -20,7 +20,7 @@ class Container extends Component {
         if (jQuery('#grid-layout').hasClass('grid-sidebar')) {
             jQuery('#grid-layout').removeClass('grid-sidebar');
             jQuery('#grid-layout').addClass('grid-no-sidebar');
-            jQuery('.inner-sidebar div').each(function () {
+            jQuery('#sidebar .inner-sidebar div').each(function () {
                 jQuery(this).addClass('hide');
             });
         }

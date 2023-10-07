@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { switchToResidentDashboard } from '../../redux/actions/actions';
 import _ from 'lodash';
+import { withTranslation } from "react-i18next";
+
 class NormativeGraph extends Component {
 
     constructor(props) {
@@ -47,15 +49,15 @@ class NormativeGraph extends Component {
 
     render() {
 
-        const { records, width } = this.props, { trackType } = this.state;
+        const { records, width,t } = this.props, { trackType } = this.state;
 
         let sortedRecords = _.sortBy(records, (d) => d[trackType]);
 
         const chartLabelMap = {
-            'totalAssessments': 'Total EPAs',
-            'achievementRate': 'Achievement Rate',
-            'totalProgress': 'Progress(%)',
-            'completedAssessments': 'Achieved EPAs'
+            'totalAssessments': t('Total EPAs'),
+            'achievementRate': t('Achievement Rate'),
+            'totalProgress': t('Progress(%)'),
+            'completedAssessments': t('Achieved EPAs')
         };
 
         const showAchievedAndTotal = trackType == 'completedAssessments';
@@ -78,19 +80,19 @@ class NormativeGraph extends Component {
                 <div className='sub-filter'>
                     <div className='radio-button-container'>
                         <RadioButton value={'totalAssessments'} id={'track_totalAssessments'} className='track-radio' name='track-select'
-                            label={"Total EPAs"}
+                            label={t("Total EPAs")}
                             onChange={this.radioChange}
                             checked={trackType == 'totalAssessments'} />
                         <RadioButton value={'achievementRate'} id={'track_achievementRate'} className='track-radio' name='track-select'
-                            label={"Achievement Rate"}
+                            label={t("Achievement Rate")}
                             onChange={this.radioChange}
                             checked={trackType == 'achievementRate'} />
                         <RadioButton value={'totalProgress'} id={'track_totalProgress'} className='track-radio' name='track-select'
-                            label={"Progress(%)"}
+                            label={t("Progress(%)")}
                             onChange={this.radioChange}
                             checked={trackType == 'totalProgress'} />
                         <RadioButton value={'completedAssessments'} id={'track_completedAssessments'} className='track-radio' name='track-select'
-                            label={"Achieved EPAs vs Total EPAs"}
+                            label={t("Achieved EPAs vs Total EPAs")}
                             onChange={this.radioChange}
                             checked={trackType == 'completedAssessments'} />
                     </div>
@@ -130,5 +132,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NormativeGraph);
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(NormativeGraph));
 

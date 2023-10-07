@@ -37,7 +37,7 @@ export default class FacultyGraph extends Component {
         let scaleY = scaleLinear().range([height - margin, margin]).domain([0, dataMax]);
         // epa score scale doesnt vary based on max values but its always between 0 and 5
         if (trackType == 'entrustment_score') {
-            scaleY = scaleLinear().range([height - margin, margin]).domain([0, 5]);
+            scaleY = scaleLinear().range([height - margin, margin]).domain([0, window.mostCommonScaleRatings.length]);
         }
 
         // create bars
@@ -84,15 +84,17 @@ export default class FacultyGraph extends Component {
         })
 
 
-        // for entrustment score we have 6 lines and special axis texts
+        // for entrustment score we have track lines and special axis texts
         if (trackType == 'entrustment_score') {
-            axisTickLines = _.times(6, (index) => {
+            axisTickLines = _.times(window.mostCommonScaleRatings.length + 1, (index) => {
                 let verticalPosition = index;
                 return line().x(d => d[0]).y(d => scaleY(d[1]))([[Xoffset, verticalPosition], [width - margin, verticalPosition]])
             })
+
+            const numberOfTicks = window.mostCommonScaleRatings.length || 1;
             axisTickTexts = _.map(axisTickLines, (unused, index) => {
                 return <text key={'axis-tick' + index}
-                    x={5} y={height - (margin / 2) - (index * ((height - (2 * margin)) / 5))} fontWeight='bold' fill='#a9a1a1'>
+                    x={5} y={height - (margin / 2) - (index * ((height - (2 * margin)) / numberOfTicks))} fontWeight='bold' fill='#a9a1a1'>
                     {axisTickTextsFormat((index))}
                 </text>
             });

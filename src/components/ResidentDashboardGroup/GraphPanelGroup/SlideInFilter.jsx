@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import Select from 'react-select';
+import { withTranslation } from "react-i18next";
 
-
-export default class SlideInFilter extends Component {
+class SlideInFilter extends Component {
 
     constructor(props) {
         super(props);
@@ -76,18 +76,20 @@ export default class SlideInFilter extends Component {
 
     render() {
 
-        const { width, filterOptions, onHighlightChange } = this.props;
+        const { width, filterOptions, onHighlightChange, t } = this.props;
         // push the table to the left from its inner position and then add 35 pixels which is original margin to the left 
         return (
             <div className='filter-box' style={{ 'width': (width * 4) - 75, 'marginLeft': (-1 * (2 * width) + 35) }}>
                 {_.map(filterOptions, (filter) => this.createSelect(filter.label, filter.options, filter.selected))}
                 <div className='inner-button-box'>
                     <button type="submit"
-                        className="btn btn-primary-outline custom-icon-container"
+                        className="btn btn-primary-outline custom-icon-container text-uppercase"
                         onClick={() => { onHighlightChange('*', {}) }}>
-                        RESET <span className="fa fa-undo"></span>
+                        {t("Reset")} <span className="fa fa-undo"></span>
                     </button>
                 </div>
             </div>)
     }
 }
+
+export default withTranslation()(SlideInFilter);

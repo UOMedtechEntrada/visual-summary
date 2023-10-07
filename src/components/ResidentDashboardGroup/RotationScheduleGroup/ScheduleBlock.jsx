@@ -95,7 +95,7 @@ export default class ScheduleBlock extends Component {
                 onClick={onScheduleBlockClick}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}>
-                {rotation_abbrev}
+                {blockWidth <= 20 ? '*' : rotation_abbrev}
             </span>);
 
 
@@ -131,7 +131,6 @@ export default class ScheduleBlock extends Component {
                     </span>
                 </span>)
             }
-
         })
 
 

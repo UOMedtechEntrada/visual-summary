@@ -60,9 +60,8 @@
                 }
             }
             .epa-label-status {
-                font-size: 15px;
+                font-size: 14px;
                 text-transform: uppercase;
-                font-weight: bold;
                 padding: 4px 15px;
                 background: steelblue;
                 border-radius: 10px;
@@ -135,6 +134,7 @@
                     display: inline-block;
                     margin: 5px 5px;
                     .custom-icon-container {
+                        text-transform: uppercase;
                         padding: 3px 10px;
                         font-weight: bold;
                         .fa-refresh {
@@ -239,8 +239,9 @@
                             .card-title {
                                 display: block;
                                 font-size: 14px;
-                                font-family: sans-serif;
                                 font-weight: bold;
+                                font-family: sans-serif;
+                                text-transform: uppercase;
                                 &.recorded-title {
                                     color: steelblue;
                                 }
@@ -252,8 +253,6 @@
                                 }
                                 &.remaining-title {
                                     color: #46b44a;
-                                    display: inline-block;
-                                    width: 20px;
                                     font-size: 14px;
                                 }
                             }
