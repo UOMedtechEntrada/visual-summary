@@ -120,7 +120,7 @@ class FilterPanel extends Component {
         //  first convert the array into the format required by react-select 
         let modifiedResidentList = _.map(residentList, (d) => {
             return {
-                label: d.fullname + " (" + (d.totalProgress || 0) + "%)",
+                label: d.fullname,
                 value: d.username,
                 currentPhase: d.currentPhase ? d.currentPhase.split("-").join(" ").toUpperCase() : ''
             };

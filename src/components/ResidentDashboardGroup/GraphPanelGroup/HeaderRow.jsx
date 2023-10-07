@@ -11,8 +11,8 @@ class HeaderRow extends Component {
     render() {
 
         const { onStageLabelClick, innerKey, isCurrentSubRootVisible,
-            epaSourceMap, residentList, residentFilter, t } = this.props;
-        let requiredEPACount = 0, achievedEPACount = 0, residentInfo, currentPhase;
+            epaSourceMap, residentList, residentFilter, t, residentEPAData } = this.props;
+        let requiredEPACount = 0, achievedEPACount = 0, residentInfo;
 
         _.map(epaSourceMap.maxObservation, (count, epaID) => {
             requiredEPACount += count;
@@ -20,6 +20,9 @@ class HeaderRow extends Component {
             // reset the completed to max amount
             achievedEPACount += Math.min(achievedCount ? achievedCount : 0, count);
         });
+
+        // Get recorded observation count
+        const recordedEPAs = _.filter(_.flatMap(residentEPAData),e=>e.EPA.split(".")[0]==innerKey);
 
         // If all the sub EPAs in a stage are marked complete,
         // then mark the stage as complete
@@ -62,6 +65,11 @@ class HeaderRow extends Component {
             iconLabel = 'fa-hourglass-half';
             statusLabel = t('In Progress');
             percentageComplete += '%';
+        }
+        else if (recordedEPAs.length > 0) {
+            iconLabel = 'fa-hourglass-half';
+            statusLabel = t('In Progress');
+            percentageComplete = '';
         }
         else {
             iconLabel = 'fa-flag-checkered';

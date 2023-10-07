@@ -7,7 +7,6 @@ import ProgramAllYearsSummary from '../ProgramEvaluationGroup/ProgramAllYearsSum
 import ProgramBasePanel from '../ProgramEvaluationGroup/ProgramBasePanel';
 import moment from 'moment';
 import downloadCSV from '../../utils/downloadCSV';
-import { NumberToEPAText } from "../../utils/convertEPA";
 import { possibleAcademicYears } from '../../utils/getAcademicYears';
 import { withTranslation } from "react-i18next";
 class ProgramDashboard extends Component {
@@ -93,7 +92,7 @@ class ProgramDashboard extends Component {
                 e['Resident_Name'] || '',
                 e['Assessor_Name'] || '',
                 e['Assessor_Role'] || '',
-                NumberToEPAText(String(e['EPA'])),
+                e['EPA'],
                 e['Rating'] || '',
                 e['Feedback'] || '',
                 e['Type'] || '',

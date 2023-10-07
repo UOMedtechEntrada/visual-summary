@@ -20,14 +20,13 @@ class RecentEPAScaleChart extends Component {
         let pointId = event.target.id.split("-")[3],
             dataPoint = data[pointId],
             tempEPA = dataPoint['EPA'].split("."),
-            epaText = dataPoint['EPA'] + " - " + programInfo.epaSourceMap[tempEPA[0]].subRoot[dataPoint['EPA']];
-
+            epaText = programInfo.epaSourceMap[tempEPA[0]].subRoot[dataPoint['EPA']];
 
         var pageWidth = window.dynamicDashboard.mountWidth;
         actions.showTooltip(true, {
             'x': event.pageX + 410 > pageWidth ? event.pageX - 410 : event.pageX + 10,
             'y': event.pageY - 50,
-            'epa': epaText,
+            'epaRawText': epaText,
             // Add an empty line to align info horizontally
             'comments': dataPoint['Feedback'] ? '\n' + dataPoint['Feedback'] : '',
             'type': dataPoint['Type'],

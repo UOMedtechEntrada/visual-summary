@@ -6,6 +6,7 @@ export default withTranslation()((props) =>
     <div className='graph-tooltip' style={{ 'left': props.x, 'top': props.y }}>
         {props.date && <p><b className='text-uppercase'>{props.t("Date")}: </b><span>{props.date}</span> </p>}
         {props.epa && <p><b className='text-uppercase'>{props.t("Epa")}: </b><span>{NumberToEPAText(props.epa)}</span> </p>}
+        {props.epaRawText && <p><b className='text-uppercase'>{props.t("Epa")}: </b><span>{props.epaRawText}</span> </p>}
         {props.type && <p><b className='text-uppercase'>{props.t("Form Type")}: </b><span>{props.type}</span> </p>}
         {props.rotation && <p><b className='text-uppercase'>{props.t("Rotation")}: </b><span>{props.rotation}</span></p>}
         {props.context && <p><b className='text-uppercase'>{props.t("Situation Context")}: </b><span>{props.context}</span></p>}
