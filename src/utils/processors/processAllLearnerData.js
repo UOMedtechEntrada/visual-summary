@@ -29,14 +29,13 @@ export default function (learnersDataDump) {
             Assessor_Group: record['assessor_group'],
             Assessor_Role: record['assessor_role'],
             Assessor_Type: record['assessor_type'],
-            Professionalism_Safety: '',
             Rating: rating.order,
             Rating_Text: '(' + rating.order + ') ' + rating.text,
             Resident_Name: '',
             Type: record.form_type,
             formID: record.form_id,
             Academic_Year: getAcademicYear(moment(record.encounter_date, 'MMM DD, YYYY').format('YYYY-MM-DD')),
-            scale: scale_map[rating.scale_id] || ['Resident Entrustment']
+            scale: scale_map[rating.scale_id] || ['No Resident Entrustment Found']
         }
     });
 
@@ -84,7 +83,7 @@ function processComments(record) {
         _.map(groupedComments[1] || [], (d) => {
             // for each , first add an empty line and then a gap line
             // Also capitalize the item title
-            comment += d.label.toLocaleUpperCase() + ": " + d.text + '\n\n';
+            comment += d.label + ": " + d.text + '\n\n';
         });
 
         return comment;

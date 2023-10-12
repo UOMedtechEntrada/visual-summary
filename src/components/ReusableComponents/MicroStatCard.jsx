@@ -2,9 +2,9 @@ import React from 'react';
 
 export default (props) => {
 
-    const { title = '', type = 'primary', metric = '', dual = false, secondMetric = '' } = props;
+    const { title = '', type = 'primary', metric = '', dual = false, secondMetric = '', extraWide } = props;
 
-    return <div className="statcard-root micro-stat text-xs-center">
+    return <div className={"statcard-root micro-stat text-xs-center" + (extraWide ? " extra-wide" : '')}>
         <div className={"statcard statcard-" + type}>
             <div className="p-a">
                 <span className="statcard-desc">{title}</span>

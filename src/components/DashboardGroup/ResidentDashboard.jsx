@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FilterPanel, GraphPanel, InfoPanel } from '../';
+import { FilterPanel, GraphPanel, FamilyMedicineGraphPanel, InfoPanel } from '../';
 
 class ResidentDashboard extends Component {
 
@@ -10,7 +10,7 @@ class ResidentDashboard extends Component {
 
     render() {
 
-        const { residentList = [], residentData, dashboard_mode, residentFilter } = this.props,
+        const { residentList = [], residentData, dashboard_mode, residentFilter, isFamilyMedicine = false } = this.props,
             width = window.dynamicDashboard.mountWidth,
             smallScreen = width < 600;
 
@@ -25,20 +25,26 @@ class ResidentDashboard extends Component {
                 <div className='m-t-md'>
                     {(residentList.length > 0) ?
                         <div>
-                            <FilterPanel dashboard_mode={dashboard_mode} />
+                            <FilterPanel isFamilyMedicine={isFamilyMedicine} dashboard_mode={dashboard_mode} />
                             {/* if the resident has no data hide everything */}
                             {+residentInfo.totalAssessments > 0 ?
                                 <div>
                                     {!(_.isEmpty(residentData)) && <InfoPanel
+                                        isFamilyMedicine={isFamilyMedicine}
                                         residentFilter={residentFilter}
                                         residentInfo={residentInfo}
                                         smallScreen={smallScreen}
                                         // add some empty space around the sides
                                         width={width - 35} />}
-                                    <GraphPanel
-                                        residentFilter={residentFilter}
-                                        width={width}
-                                        smallScreen={smallScreen} />
+                                    {isFamilyMedicine ?
+                                        <FamilyMedicineGraphPanel
+                                            residentFilter={residentFilter}
+                                            width={width}
+                                            smallScreen={smallScreen} /> :
+                                        <GraphPanel
+                                            residentFilter={residentFilter}
+                                            width={width}
+                                            smallScreen={smallScreen} />}
                                 </div> :
                                 <h3 className='text-primary text-center m-t-lg'>
                                     Sorry the selected resident has no observed EPAs.

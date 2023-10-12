@@ -85,7 +85,7 @@ export default class GraphRow extends Component {
                 y: yScale(d.Rating),
                 highlight,
                 pureData: d,
-                concern: (d.Professionalism_Safety != '' && d.Professionalism_Safety != "No")
+                concern: d.concernFlagged
             };
 
         });

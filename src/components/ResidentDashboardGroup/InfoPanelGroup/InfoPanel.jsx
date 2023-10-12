@@ -16,7 +16,7 @@ class InfoPanel extends Component {
     render() {
 
         let { residentData, residentFilter, rotationSchedule = [],
-            programInfo, width, smallScreen, residentInfo } = this.props;
+            programInfo, width, smallScreen, residentInfo, isFamilyMedicine = false } = this.props;
 
         return (
             <div className='info-panel'>
@@ -26,14 +26,18 @@ class InfoPanel extends Component {
                     {!!residentData &&
                         <EPASpeedInfo
                             width={width}
+                            isFamilyMedicine={isFamilyMedicine}
                             smallScreen={smallScreen}
                             residentData={residentData}
                             residentInfo={residentInfo}
                             residentFilter={residentFilter} />}
                     <div className="info-panel-subcharts-wrapper">
-                        {!smallScreen &&
-                            <RecentEPATrend width={width}
-                                residentData={residentData} programInfo={programInfo} />}
+                        {!smallScreen && !isFamilyMedicine &&
+                            <RecentEPATrend
+                                width={width}
+                                isFamilyMedicine={isFamilyMedicine}
+                                residentData={residentData}
+                                programInfo={programInfo} />}
                     </div>
                 </div>
             </div>

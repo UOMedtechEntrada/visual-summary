@@ -114,6 +114,10 @@
                     display: inline-block;
                     margin: 5px 15px;
 
+                    &.family-medicine {
+                        width: 275px;
+                    }
+
                     input {
                         min-height: inherit !important;
                     }
@@ -128,7 +132,12 @@
                     }
                     .select-container-filter {
                         display: inline-block;
+
                         width: 250px;
+
+                        &.family-medicine {
+                            width: 275px;
+                        }
                     }
                 }
                 .inner-button-box {
@@ -200,7 +209,7 @@
                     margin-bottom: 10px;
                     position: relative;
 
-                    .chart-form-title{
+                    .chart-form-title {
                         margin-top: 5px;
                     }
                 }

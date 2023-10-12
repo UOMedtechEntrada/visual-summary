@@ -51,7 +51,7 @@ class NormativeGraph extends Component {
 
     render() {
 
-        const { records, width } = this.props, { trackType } = this.state;
+        const { records, width, isFamilyMedicine } = this.props, { trackType } = this.state;
 
         let sortedRecords = _.sortBy(records, (d) => d[trackType]);
 
@@ -92,26 +92,27 @@ class NormativeGraph extends Component {
 
         return (
             <div className='normative-graph m-b'>
-                <div className='sub-filter'>
-                    <div className='radio-button-container'>
-                        <RadioButton value={'totalAssessments'} id={'track_totalAssessments'} className='track-radio' name='track-select'
-                            label={"Total EPAs"}
-                            onChange={this.radioChange}
-                            checked={trackType == 'totalAssessments'} />
-                        <RadioButton value={'achievementRate'} id={'track_achievementRate'} className='track-radio' name='track-select'
-                            label={"Achievement Rate"}
-                            onChange={this.radioChange}
-                            checked={trackType == 'achievementRate'} />
-                        <RadioButton value={'totalProgress'} id={'track_totalProgress'} className='track-radio' name='track-select'
-                            label={"Progress(%)"}
-                            onChange={this.radioChange}
-                            checked={trackType == 'totalProgress'} />
-                        <RadioButton value={'completedAssessments'} id={'track_completedAssessments'} className='track-radio' name='track-select'
-                            label={"Achieved EPAs vs Total EPAs"}
-                            onChange={this.radioChange}
-                            checked={trackType == 'completedAssessments'} />
-                    </div>
-                </div>
+                {!isFamilyMedicine &&
+                    <div className='sub-filter'>
+                        <div className='radio-button-container'>
+                            <RadioButton value={'totalAssessments'} id={'track_totalAssessments'} className='track-radio' name='track-select'
+                                label={"Total EPAs"}
+                                onChange={this.radioChange}
+                                checked={trackType == 'totalAssessments'} />
+                            <RadioButton value={'achievementRate'} id={'track_achievementRate'} className='track-radio' name='track-select'
+                                label={"Achievement Rate"}
+                                onChange={this.radioChange}
+                                checked={trackType == 'achievementRate'} />
+                            <RadioButton value={'totalProgress'} id={'track_totalProgress'} className='track-radio' name='track-select'
+                                label={"Progress(%)"}
+                                onChange={this.radioChange}
+                                checked={trackType == 'totalProgress'} />
+                            <RadioButton value={'completedAssessments'} id={'track_completedAssessments'} className='track-radio' name='track-select'
+                                label={"Achieved EPAs vs Total EPAs"}
+                                onChange={this.radioChange}
+                                checked={trackType == 'completedAssessments'} />
+                        </div>
+                    </div>}
                 <div className='bar-chart-wrapper' style={{ 'width': width, 'height': 450 }} onClick={this.handleChartClick}>
                     <Bar
                         ref={r => this.chartCtx = r && r.getChart()}

@@ -3,9 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { showTooltip, setLevelVisibilityStatus } from '../../../redux/actions/actions';
 import GraphRow from './GraphRow';
-import HeaderRow from './HeaderRow';
 import Tooltip from './Tooltip';
-import { NumberToEPAText } from '../../../utils/convertEPA';
 
 
 class GraphPanel extends Component {
@@ -14,83 +12,12 @@ class GraphPanel extends Component {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
-        this.onStageLabelClick = this.onStageLabelClick.bind(this);
-        this.onInfoClick = this.onInfoClick.bind(this);
-        this.onTableExpandClick = this.onTableExpandClick.bind(this);
-        this.onFilterExpandClick = this.onFilterExpandClick.bind(this);
-        this.state = {
-            openTableID: '',
-            openFilterID: ''
-        };
     }
-
-    onInfoClick(event) {
-
-        const { programInfo } = this.props, { epaSourceMap } = programInfo;
-
-        event.stopPropagation();
-
-        // add in information about the EPA
-        const classID = event.target.className.split(" ")[4],
-            // remove "epa-formid-" and then convert 1-1 to 1.1
-            epaSource = classID.split('-').slice(2).join('.');
-        // Get the objectiveID from source MAP *
-        const objectiveId = epaSourceMap[epaSource.split(".")[0]].objectiveID[epaSource];
-        // populate other info
-        let proxyId = this.props.residentFilter.username;
-        let courseId = course_id;
-        let epa = NumberToEPAText(epaSource.trim());
-        let options = {
-            firstName: '',
-            lastName: '',
-            titlePrepend: epa,
-            container: '.wrapper-' + classID,
-            placement: 'left',
-            // remove any attached popovers from DOM
-            onDestroy: () => { jQuery('.popover').remove() }
-        }
-        new ObjectiveRequirementDisplay(jQuery(document.getElementById('info-' + classID)), proxyId, courseId, objectiveId, options);
-    }
-
-    onStageLabelClick(event) {
-        const clickedID = +event.currentTarget.className.split('label-index-')[1];
-        let visibilityOpenStatus = { ...this.props.levelVisibilityOpenStatus };
-        visibilityOpenStatus[clickedID] = !visibilityOpenStatus[clickedID];
-        this.props.actions.setLevelVisibilityStatus(visibilityOpenStatus);
-        this.setState({ openTableID: '' });
-    }
-
-    onTableExpandClick(event) {
-        const classID = event.target.className.split(" ")[4],
-            // remove "epa-"
-            openTableID = classID.slice(4);
-        // if already open close it , if not open it !
-        if (event.target.className.indexOf('open-table') > -1) {
-            this.setState({ openTableID: '', openFilterID: '' });
-        }
-        else {
-            this.setState({ openTableID, openFilterID: '' });
-        }
-    }
-    onFilterExpandClick(event) {
-        const classID = event.target.className.split(" ")[4],
-            // remove "epa-" 
-            openFilterID = classID.slice(4);
-        // if already open close it , if not open it !
-        if (event.target.className.indexOf('open-filter') > -1) {
-            this.setState({ openFilterID: '', openTableID: '' });
-        }
-        else {
-            this.setState({ openFilterID, openTableID: '' });
-        }
-    }
-
     onMouseOver(event) {
         let { residentData, actions } = this.props;
         let pointId = event.target.id.split("-");
         let dataList = residentData[pointId[4] + '.' + pointId[5]],
-            dataGroupedByForm = _.groupBy(dataList, (d) => d.formID),
-            data = dataGroupedByForm[pointId[3]][pointId[7]],
+            data = _.find(dataList, d => d.recordID == pointId[7]),
             pageWidth = window.dynamicDashboard.mountWidth;
 
         actions.showTooltip(true, {
@@ -116,10 +43,7 @@ class GraphPanel extends Component {
 
         let { residentData, residentFilter = {},
             isTooltipVisible,
-            tooltipData, smallScreen, width,
-            levelVisibilityOpenStatus, programInfo = {} } = this.props;
-
-        const { openTableID, openFilterID } = this.state;
+            tooltipData, smallScreen, width, programInfo = {} } = this.props;
 
         const { isAllData = true, hideNoDataEPAs = false } = residentFilter;
 
@@ -167,64 +91,42 @@ class GraphPanel extends Component {
                     {/* code chunk to show tooltip*/}
                     {isTooltipVisible && <Tooltip {...tooltipData} />}
 
-                    {/* code chunk for displaying titles above the table */}
-                    <div className='title-root text-xs-center'>
-                        <h4 style={{ width: widthPartition }} className='title-bar'>EPA(Entrustable Professional Activity)</h4>
-                        <h4 style={{ width: widthPartition }} className='title-bar'>Observation Count</h4>
-                        <h4 style={{ width: smallScreen ? widthPartition : widthPartition * 2 }} className='title-bar'>Score History</h4>
-                    </div>
-
                     {/* This is the main container which houses the table contents */}
                     <div style={{ width: widthOfRootGraphPanel }} className='panel-inner-root'>
                         {_.map(epaSourcesThatExist, (epaSources, innerKey) => {
 
-                            let isCurrentSubRootVisible = levelVisibilityOpenStatus[innerKey],
-                                epaSpecificSourceMap = epaSourceMap[innerKey] || {
-                                    'ID': 'N/A',
-                                    'topic': 'N/A',
-                                    subRoot: {},
-                                    maxObservation: {},
-                                    observed: {},
-                                    completed: {},
-                                    achieved: {},
-                                    objectiveID: {},
-                                    assessmentInfo: {},
-                                    filterValuesDict: {}
-                                };
+                            let epaSpecificSourceMap = epaSourceMap[innerKey] || {
+                                'ID': 'N/A',
+                                'topic': 'N/A',
+                                subRoot: {},
+                                maxObservation: {},
+                                observed: {},
+                                completed: {},
+                                achieved: {},
+                                objectiveID: {},
+                                assessmentInfo: {},
+                                filterValuesDict: {}
+                            };
 
                             return (
                                 <div className="inner-sub-root" key={'sub-root-' + innerKey}>
-
-                                    {/* EPA Label Row head that can be clicked to expand or collapse */}
-                                    <HeaderRow
-                                        onStageLabelClick={this.onStageLabelClick}
-                                        innerKey={innerKey}
-                                        smallScreen={smallScreen}
-                                        isCurrentSubRootVisible={isCurrentSubRootVisible}
-                                        epaSourceMap={epaSpecificSourceMap} />
-
                                     {/* Actual Row data containing labels and bullet and line charts */}
-                                    <div className={'inner-graph-row ' + (isCurrentSubRootVisible ? 'show-row' : 'hide-row')}>
+                                    <div className={'inner-graph-row show-row'}>
                                         {_.map(epaSources, (epaSource, sourceKey) => {
                                             return (
                                                 <GraphRow
                                                     key={'inner-row-' + sourceKey}
+                                                    isAllData={isAllData}
                                                     innerKey={innerKey}
                                                     epaSource={epaSource}
-                                                    openTableID={openTableID}
-                                                    openFilterID={openFilterID}
                                                     widthPartition={widthPartition}
                                                     epaSourceMap={epaSpecificSourceMap}
                                                     smallScreen={smallScreen}
                                                     residentEPAData={residentData[epaSource] || []}
                                                     onMouseOver={this.onMouseOver}
-                                                    onMouseOut={this.onMouseOut}
-                                                    onInfoClick={this.onInfoClick}
-                                                    onTableExpandClick={this.onTableExpandClick}
-                                                    onFilterExpandClick={this.onFilterExpandClick} />)
+                                                    onMouseOut={this.onMouseOut} />)
                                         })}
                                     </div>
-
                                 </div>)
                         })}
                     </div>

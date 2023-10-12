@@ -7,7 +7,7 @@ module.exports = {
     mode: 'development',
     entry: ['babel-polyfill', './src/app.jsx'],
     output: {
-        path: path.resolve("C:\\Users\\bvenk\\Sites\\elentra-1x-me\\www-root\\javascript"),
+        path: path.resolve("F:\\Sites\\elentra-1x-me\\www-root\\javascript"),
         filename: "dynamic-dashboard.js"
     },
     watch: true,

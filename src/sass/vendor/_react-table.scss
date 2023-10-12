@@ -511,7 +511,7 @@
             }
             .rt-td.feedback-cell,
             .rt-td.situation-cell {
-                white-space: normal;
+                white-space: pre-wrap;
                 text-overflow: inherit;
                 text-align: left;
             }

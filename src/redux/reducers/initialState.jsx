@@ -1,8 +1,11 @@
+let isFamilyMedicine
+
 export default {
   oracle: {
     loaderState: false,
     filterLoaderState: false,
     activePage: dashboard_options.dashboard_mode == 'resident' ? 'resident' : 'normative',
+    isFamilyMedicine: dashboard_options.course_name.toLowerCase().indexOf('family medicine') > -1 || false,
     residentData: null,
     rotationSchedule: [],
     residentFilter: {

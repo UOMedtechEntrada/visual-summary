@@ -18,12 +18,12 @@ class NormativeDashboard extends Component {
 
     render() {
 
-        const { residentList } = this.props, { currentStage, removeNoRecords } = this.state;
+        const { residentList, isFamilyMedicine } = this.props, { currentStage, removeNoRecords } = this.state;
 
         const residentsInPhase = (currentStage == 'All-Training-Stages') ? residentList :
             _.filter(residentList, (res) => res['currentPhase'] == currentStage);
 
-        const filteredList = removeNoRecords ?
+        const filteredList = (isFamilyMedicine ? false : removeNoRecords) ?
             _.filter(residentsInPhase, (d) => d['totalAssessments'] > 0) : residentsInPhase;
 
         const overallWidth = window.dynamicDashboard.mountWidth;
@@ -38,18 +38,20 @@ class NormativeDashboard extends Component {
         return (
             <div className='normative-data-container'>
                 <div className='text-center'>
-                    <NormativeFilterPanel
+                    {!isFamilyMedicine && <NormativeFilterPanel
                         currentStage={currentStage}
                         removeNoRecords={removeNoRecords}
                         onStageChange={this.onStageChange}
-                        onNoRecordChange={this.onNoRecordChange} />
+                        onNoRecordChange={this.onNoRecordChange} />}
                     {filteredList.length > 0 ?
                         <div className='normative-inner-root'>
                             <NormativeGraph
+                                isFamilyMedicine={isFamilyMedicine}
                                 width={graphMountWidth}
                                 records={filteredList} />
                             <NormativeTable
                                 width={tableWidth}
+                                isFamilyMedicine={isFamilyMedicine}
                                 smallScreen={smallScreen}
                                 records={filteredList} />
                         </div> :

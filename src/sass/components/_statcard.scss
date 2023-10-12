@@ -15,4 +15,8 @@
     width: 160px;
     margin: 10px;
     display: inline-block;
+
+    &.extra-wide {
+        width: 185px;
+    }
 }

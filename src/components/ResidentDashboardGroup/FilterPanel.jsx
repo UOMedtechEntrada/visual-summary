@@ -117,15 +117,16 @@ class FilterPanel extends Component {
     render() {
 
         const { filterLoaderState, residentList = []
-            , residentFilter = {}, dashboard_mode = 'faculty', residentData } = this.props,
+            , residentFilter = {}, dashboard_mode = 'faculty', residentData, isFamilyMedicine = false } = this.props,
             { isAllData = true, username = '',
                 startDate, endDate, hideNoDataEPAs } = residentFilter;
         //  first convert the array into the format required by react-select 
+        // for family medicine revert training stages to empty
         let modifiedResidentList = _.map(residentList, (d) => {
             return {
-                label: d.fullname + " (" + (d.totalProgress || 0) + "%)",
+                label: d.fullname + (isFamilyMedicine ? '' : (" (" + (d.totalProgress || 0) + "%)")),
                 value: d.username,
-                currentPhase: d.currentPhase ? d.currentPhase.split("-").join(" ").toUpperCase() : ''
+                currentPhase: isFamilyMedicine ? '' : (d.currentPhase ? d.currentPhase.split("-").join(" ").toUpperCase() : '')
             };
         })
         // then group the array based on current phase of resident
@@ -174,7 +175,7 @@ class FilterPanel extends Component {
 
                     {isFacultyMode && <div className='text-xs-left button-box'>
                         <button type="submit" className="filter-button btn btn-primary-outline" onClick={this.onSubmit}>
-                            GET RECORDS
+                            GET {isFamilyMedicine ? "FIELD NOTES" : "RECORDS"}
                             {filterLoaderState && <i className='fa fa-spinner fa-spin filter-loader'></i>}
                         </button>
                     </div>}
@@ -194,14 +195,15 @@ class FilterPanel extends Component {
                         onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
                     />
 
-                    <div className="checkbox custom-control text-center custom-checkbox">
-                        <label className='custom-checkbox-label'>
-                            Hide EPAs with no assessments in the time period.
-                            <input id='filter-dateFilterActive' type="checkbox"
-                                checked={hideNoDataEPAs} onChange={this.onHideNoRecordEPAs} />
-                            <span className="custom-control-indicator"></span>
-                        </label>
-                    </div>
+                    {!isFamilyMedicine &&
+                        <div className="checkbox custom-control text-center custom-checkbox">
+                            <label className='custom-checkbox-label'>
+                                Hide EPAs with no assessments in the time period.
+                                <input id='filter-dateFilterActive' type="checkbox"
+                                    checked={hideNoDataEPAs} onChange={this.onHideNoRecordEPAs} />
+                                <span className="custom-control-indicator"></span>
+                            </label>
+                        </div>}
                 </div>
             </div>
         );

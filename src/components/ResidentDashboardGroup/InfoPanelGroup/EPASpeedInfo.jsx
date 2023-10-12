@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip';
 export default (props) => {
 
     const { residentData, smallScreen, residentFilter, width,
-        residentInfo = {} } = props,
+        residentInfo = {}, isFamilyMedicine } = props,
         residentDataList = _.flatMap(residentData);
 
     // Get the required Metrics 
@@ -23,8 +23,10 @@ export default (props) => {
     // One mobile screens we hide the weekly chart and show regular statcards
     const CardComponent = smallScreen ? StatCard : MicroStatCard;
 
+    const assessmentIdentifierText = isFamilyMedicine ? 'Field Note' : 'EPA';
+
     return (
-        <div className='epaSpeedBox'>
+        <div className='epaSpeedBox text-center'>
             <div className="hr-divider">
                 <h4 className="hr-divider-content"> ACQUISITION METRICS  <i data-for='acq-infotip' data-tip={infoTooltipReference.residentMetrics.acquisitionMetricsForResident} className="fa fa-info-circle instant-tooltip-trigger"></i></h4>
                 <ReactTooltip id='acq-infotip' className='custom-react-tooltip' />
@@ -32,21 +34,21 @@ export default (props) => {
             <div className='card-wrapper'>
                 {residentFilter.isAllData ?
                     <div className='row text-center m-t'>
-                        <CardComponent title='Total EPAs Observed' type='primary' metric={totalEPAs} />
-                        <CardComponent title='Progress Rate' type='success' metric={totalProgress + '%'} />
-                        <CardComponent title='Achievement Rate' type='danger' metric={achievementRate + '%'} />
+                        <CardComponent extraWide={isFamilyMedicine} title={'Total ' + assessmentIdentifierText + 's Observed'} type='primary' metric={totalEPAs} />
+                        {!isFamilyMedicine && <CardComponent title='Progress Rate' type='success' metric={totalProgress + '%'} />}
+                        {!isFamilyMedicine && <CardComponent title='Achievement Rate' type='danger' metric={achievementRate + '%'} />}
                     </div> :
                     <div className='row text-center'>
-                        <CardComponent dual={true} title='Total EPAs Observed' type='primary' metric={totalEPAs} secondMetric={recordsInPeriodCount} />
-                        <CardComponent title='Progress Rate' type='success' metric={totalProgress + '%'} />
-                        <CardComponent title='Achievement Rate' type='danger' metric={achievementRate + '%'} />
+                        <CardComponent extraWide={isFamilyMedicine} dual={true} title={'Total ' + assessmentIdentifierText + 's Observed'} type='primary' metric={totalEPAs} secondMetric={recordsInPeriodCount} />
+                        {!isFamilyMedicine && <CardComponent title='Progress Rate' type='success' metric={totalProgress + '%'} />}
+                        {!isFamilyMedicine && <CardComponent title='Achievement Rate' type='danger' metric={achievementRate + '%'} />}
                     </div>}
             </div>
             {!smallScreen &&
                 < WeeklyEPAChart
                     // the three cards in EPASpeedInfo each take 160 pixels 
                     // so removing that and the extra margin
-                    width={width - 575}
+                    width={width - (isFamilyMedicine ? 235 : 575)}
                     residentData={residentData}
                     residentInfo={residentInfo}
                     residentFilter={residentFilter} />}

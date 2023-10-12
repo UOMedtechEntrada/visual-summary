@@ -1,19 +1,24 @@
+
+let isFamilyMedicine = dashboard_options.course_name.toLowerCase().indexOf('family medicine') > -1 || false,
+    assessmentIdentifierText = isFamilyMedicine ? 'Field Note' : 'EPA',
+    dateFilterText = isFamilyMedicine ? `Click this to enable a date filter that allows users to only view field notes that fall in a time period.` : `Click this to enable a date filter that allows users to highlight assessments that fall in a time period. The assessments in the selected time period turn from regular round points to diamond shaped points.`;
+
 export default {
     residentMetrics: {
-        main: `This dashboard organizes the EPAs that have been completed by each of the residents in the program with the goal of informing resident learning and comptence committee assessment.`,
-        dateFilter: `Click this to enable a date filter that allows users to highlight assessments that fall in a time period. The assessments in the selected time period turn from regular round points to diamond shaped points.`,
+        main: `This dashboard organizes the ` + assessmentIdentifierText + `s that have been completed by each of the residents in the program with the goal of informing resident learning and comptence committee assessment.`,
+        dateFilter: dateFilterText,
         viewHistory: `This button loads rotation schedules from prior years if available.`,
         viewEPAsBlock: `This button displays the number of EPAs completed during the specified rotation. A heat map (from red to green) indicates whether this is below, at, or above 10 EPAs per block.`,
         rotationSchedule: `A chronological map of the one45 rotation schedule of the resident. Hover the mouse over any block to see additional information about that rotation block.`,
-        acquisitionMetricsForResident: `The boxes to the left show the amalgamated metrics for EPAs completed by the selected resident. The chart to the right visualizes the weekly EPA acquisition rate of the resident for the last six months.`,
-        recentEPAs: `This graph displays the most recently completed EPAs by time (oldest to newest on the horizontal axis) and entrustment score ('I had to do' to 'I didn't need to be there') on the vertical axis.  The drop-down menu can load the last 10, last 25, last 1 month, or last 3 months of EPAs. Mousing over each EPA displays additional EPA details.`,
-        showEPATable: `Clicking the 'open book' icon opens a table displaying detailed information on each assessment. The table is sortable (click column header) and searchable (click in the white box and type). This information can also be seen by mousing-over individual EPAs.`,
-        showEPAFilter: `Clicking the 'gears' icon opens a list of drop-down menus for contextual variables. When one or more contextual variable is selected the EPAs containing that variable will turn from black to red.`,
-        showObjectiveBreakdown: `Clicking the 'info' icon opens a popup with a breakdown of the completed and required objectives for the given EPA.`
+        acquisitionMetricsForResident: `The boxes to the left show the amalgamated metrics for ` + assessmentIdentifierText + `s completed by the selected resident. The chart to the right visualizes the weekly ` + assessmentIdentifierText + ` acquisition rate of the resident for the last six months.`,
+        recentEPAs: `This graph displays the most recently completed ` + assessmentIdentifierText + `s by time (oldest to newest on the horizontal axis) and entrustment scores on the vertical axis.  The drop-down menu can load the last 10, last 25, last 1 month, or last 3 months of ` + assessmentIdentifierText + `s. Mousing over each ` + assessmentIdentifierText + ` displays additional ` + assessmentIdentifierText + ` details.`,
+        showEPATable: `Clicking the 'open book' icon opens a table displaying detailed information on each assessment. The table is sortable (click column header) and searchable (click in the white box and type). This information can also be seen by mousing-over individual ` + assessmentIdentifierText + `s.`,
+        showEPAFilter: `Clicking the 'gears' icon opens a list of drop-down menus for contextual variables. When one or more contextual variable is selected the ` + assessmentIdentifierText + `s containing that variable will turn from black to red.`,
+        showObjectiveBreakdown: `Clicking the 'info' icon opens a popup with a breakdown of the completed and required objectives for the given ` + assessmentIdentifierText + `.`
     },
     normativeAssessment: {
-        main: `This dashboard compares the EPA completion of each of the residents in the program with the goal of providing normative context to the competence committee.`,
-        stages: `Select a resident stage to chart the EPA metrics of the residents currently in that stage. By default EPA metrics are mapped for all stages combined. Additional information can be reviewed by selecting the respective graph using the radio buttons below. Finally residents without any data are filtered out by default but this can be toggled using the checkbox.`
+        main: `This dashboard compares the ` + assessmentIdentifierText + ` completion of each of the residents in the program with the goal of providing normative context to the competence committee.`,
+        stages: `Select a resident stage to chart the ` + assessmentIdentifierText + ` metrics of the residents currently in that stage. By default ` + assessmentIdentifierText + ` metrics are mapped for all stages combined. Additional information can be reviewed by selecting the respective graph using the radio buttons below. Finally residents without any data are filtered out by default but this can be toggled using the checkbox.`
     },
     facultyDevlopment: {
         main: `This dashboard organizes all of the EPAs that have been completed for residents in the program by the Faculty member that completed them with the goal of informing faculty development.`,

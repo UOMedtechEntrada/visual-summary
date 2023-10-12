@@ -10,6 +10,7 @@ export { default as NormativeGraph } from './NormativeDashboardGroup/NormativeGr
 
 // Components for Resident Dashboard to compare residents
 export { default as GraphPanel } from './ResidentDashboardGroup/GraphPanelGroup/GraphPanel';
+export { default as FamilyMedicineGraphPanel } from './ResidentDashboardGroup/FamilyMedicineGraphPanelGroup/GraphPanel';
 export { default as InfoPanel } from './ResidentDashboardGroup/InfoPanelGroup/InfoPanel';
 export { default as FilterPanel } from './ResidentDashboardGroup/FilterPanel';
 

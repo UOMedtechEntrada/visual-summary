@@ -29,10 +29,24 @@ const columns = [{
     maxWidth: 130
 }];
 
+const familyMedicineColumns = [{
+    Header: 'Name',
+    accessor: 'fullname',
+    className: 'text-left'
+},
+{
+    Header: 'Field Note Count',
+    accessor: 'totalAssessments',
+    className: 'text-center',
+    maxWidth: 175
+}];
+
 let NormativeTable = (props) => {
 
+
+    const customColumns = props.isFamilyMedicine ? familyMedicineColumns : columns;
     // For small screens the table spans the entire width so dont set any maxwidth 
-    const moddedColumns = _.map(columns, (column) => {
+    const moddedColumns = _.map(customColumns, (column) => {
         const { maxWidth, ...otherProps } = column;
         return props.smallScreen ? { ...otherProps } : { ...column };
     });

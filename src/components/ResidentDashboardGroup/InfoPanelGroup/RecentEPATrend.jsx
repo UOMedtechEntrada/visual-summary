@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import _ from 'lodash';
 import moment from 'moment';
-import { line, scaleLinear } from 'd3';
-import TrackTrails from '../GraphPanelGroup/TrackTrails';
-import TrackLegend from '../GraphPanelGroup/TrackLegend';
-import { showTooltip } from '../../../redux/actions/actions';
-import oScoreReference from '../../../utils/oScoreReference';
-import infoTooltipReference from '../../../utils/infoTooltipReference';
 import ReactTooltip from 'react-tooltip';
+import RecentEPAScaleChart from './RecentEPAScaleChart';
+import infoTooltipReference from '../../../utils/infoTooltipReference';
 
 class RecentEPATrend extends Component {
 
@@ -19,9 +14,6 @@ class RecentEPATrend extends Component {
             filterRange: '25'
         }
         this.setFilterRange = this.setFilterRange.bind(this);
-        this.getDataList = this.getDataList.bind(this);
-        this.onMouseOver = this.onMouseOver.bind(this);
-        this.onMouseOut = this.onMouseOut.bind(this);
     }
 
     setFilterRange(event) {
@@ -29,37 +21,7 @@ class RecentEPATrend extends Component {
         this.setState({ filterRange: document.getElementById('recent-resident-data').value });
     }
 
-    onMouseOver(event) {
-        const { actions, programInfo } = this.props;
-
-        let pointId = event.target.id.split("-")[1],
-            data = this.getDataList()[pointId],
-            tempEPA = data['EPA'].split("."),
-            epaText = data['EPA'] + " - " + programInfo.epaSourceMap[tempEPA[0]].subRoot[data['EPA']];
-
-
-        var pageWidth = window.dynamicDashboard.mountWidth;
-        actions.showTooltip(true, {
-            'x': event.pageX + 400 > pageWidth ? event.pageX - 400 : event.pageX,
-            'y': event.pageY - 50,
-            'epa': epaText,
-            // Add an empty line to align info horizontally
-            'comments': data['Feedback'] ? '\n' + data['Feedback'] : '',
-            'type': data['Type'],
-            'name': data['Assessor_Name'],
-            'group': data['Assessor_Group'],
-            'date': data['Date'],
-            // Add an empty line to align info horizontally
-            'context': '\n' + data['Situation_Context']
-        });
-
-    }
-
-    onMouseOut(event) {
-        this.props.actions.showTooltip(false);
-    }
-
-    getDataList() {
+    getDataList = () => {
 
         const { residentData = {} } = this.props, { filterRange } = this.state;
 
@@ -79,75 +41,18 @@ class RecentEPATrend extends Component {
 
     render() {
 
-        const dataList = this.getDataList(), { filterRange } = this.state, { width } = this.props;
+        const dataList = this.getDataList(), { filterRange } = this.state, { width, programInfo, isFamilyMedicine = false } = this.props;
 
-        const d3Line = line().x((d) => d.x).y((d) => d.y),
-            innerHeight = 200,
-            marginHorizontal = 25,
-            marginVertical = 25,
-            xScale = scaleLinear().domain([0, dataList.length - 1]).range([marginHorizontal + 20, width - marginHorizontal]),
-            yScale = scaleLinear().domain([5, 1]).range([marginVertical, innerHeight - marginVertical])
+        // Find the different Scale Groups 
+        const dataGroupedByScales = _.map(_.groupBy(dataList, d => d.scale.join(':::')), (data, s) => ({ 'scale': s.split(':::'), data }));
 
-
-        const trackTrailPositions = _.map([...Array(5)], (d, i) => {
-            return {
-                x: marginHorizontal + 20,
-                dx: width - (2 * marginHorizontal) - 20,
-                y: yScale(i + 1)
-            }
-        });
-
-        const legends = _.map(oScoreReference, (d, i) => {
-            return {
-                x: marginHorizontal,
-                y: yScale(i + 1),
-                labelID: i + 1,
-                label: d
-            }
-        });
-
-        const pointList = dataList.map((d, i) => {
-            return {
-                x: xScale(i),
-                y: yScale(d.Rating),
-                pureData: d
-            };
-        });
-
-        // if a record has been marked by the filterpanel it means it lies in
-        // a date range selected by the user
-        // so make it a diamond instead of a circle
-        const elementList = _.map(pointList, (d, i) => {
-
-            if (d.pureData.mark) {
-                return <polygon
-                    id={'recentPoint-' + i}
-                    className='score-point'
-                    key={'recent-point-' + i}
-                    fill={'white'}
-                    stroke={'#252830'}
-                    strokeWidth={3}
-                    points={(d.x - 6) + "," + d.y + " " + d.x + "," + (d.y + 6) + " " + (d.x + 6) + "," + d.y + " " + (d.x) + "," + (d.y - 6) + " " + (d.x - 6) + "," + (d.y)}
-                    onMouseOver={this.onMouseOver}
-                    onMouseOut={this.onMouseOut} />
-            }
-
-            return <circle
-                id={'recentPoint-' + i}
-                className='score-point'
-                key={'recent-point-' + i}
-                fill={'#252830'}
-                cx={d.x} cy={d.y} r={6}
-                onMouseOver={this.onMouseOver}
-                onMouseOut={this.onMouseOut}>
-            </circle>
-        });
+        const assessmentIdentifierText = isFamilyMedicine ? 'Narrative' : 'EPA';
 
         return (
             <div className='recent-epa-container'>
                 <div className="hr-divider">
                     <h4 className="hr-divider-content">
-                        RECENT EPAs
+                        RECENT {assessmentIdentifierText}s
                         <i data-for='recent-infotip' data-tip={infoTooltipReference.residentMetrics.recentEPAs} className="fa fa-info-circle instant-tooltip-trigger"></i>
                     </h4>
                     <ReactTooltip id='recent-infotip' className='custom-react-tooltip' />
@@ -159,7 +64,7 @@ class RecentEPATrend extends Component {
                             <option value='10'>10 Records</option>
                             <option value='25'>25 Records</option>
                             <option value='1-month'>1 Month</option>
-                            <option value='3-month'>3 Months</option>
+                            <option value='3-month'>3 Month</option>
                         </select>
                         <button className={'btn btn-primary-outline'} onClick={this.setFilterRange}>
                             <span className="fa fa-play"></span>
@@ -167,17 +72,20 @@ class RecentEPATrend extends Component {
 
                     </div>
                 </div>
-                <svg height={innerHeight} width={width} className='recent-svg' >
-                    {dataList.length <= 0 ?
-                        <text x={(width - 190) / 2} y={innerHeight / 2} className="no-data-banner">No Records Available</text> :
-                        <g>
-                            <TrackLegend legends={legends} />
-                            <TrackTrails trackTrailPositions={trackTrailPositions} />
-                            <path className='score-spark-line' d={d3Line(pointList)}></path>
-                            {elementList}
-                        </g>
-                    }
-                </svg>
+                <div style={{ 'width': width }}>
+                    {dataGroupedByScales.length > 0 ?
+                        (_.map(dataGroupedByScales, (e, scaleIndex) =>
+                            <RecentEPAScaleChart
+                                scaleTitle={e.data[0].scaleTitle}
+                                key={'scale-' + scaleIndex}
+                                scaleKey={'scale-' + scaleIndex}
+                                programInfo={programInfo}
+                                scale={[...e.scale]}
+                                data={[...e.data]}
+                                width={width} />)) :
+                        <h4 className='text-center m-t m-b'>No records available</h4>}
+                </div>
+
             </div>)
     }
 }
@@ -188,11 +96,12 @@ function mapStateToProps(state) {
         residentData: state.oracle.residentData
     };
 }
+export default connect(mapStateToProps, {})(RecentEPATrend);
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({ showTooltip }, dispatch)
-    };
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecentEPATrend);
+
+
+
+
+
+

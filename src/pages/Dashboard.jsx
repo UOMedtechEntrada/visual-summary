@@ -20,9 +20,10 @@ class DashboardRoot extends Component {
 
     render() {
 
-        let { activePage = 'resident' } = this.props,
+        let { activePage = 'resident', isFamilyMedicine } = this.props,
             { dashboard_mode = 'resident', advanced_mode = 'disabled' } = dashboard_options;
 
+        // Hide other dashboards for Family Medicine 
         return (
             <div className='custom-dashboard-page-root' >
                 <div>
@@ -35,14 +36,14 @@ class DashboardRoot extends Component {
                                 <li className={activePage == 'normative' ? 'active' : ''}>
                                     <a data-tip={infoTooltipReference.normativeAssessment.main} id='normative-tab' onClick={this.onTabClick} >NORMATIVE ASSESSMENT</a>
                                 </li>
-                                {advanced_mode == 'enabled' && <li className={activePage == 'supervisor' ? 'active' : ''}>
+                                {advanced_mode == 'enabled' && !isFamilyMedicine && <li className={activePage == 'supervisor' ? 'active' : ''}>
                                     <a data-tip={infoTooltipReference.facultyDevlopment.main} id='supervisor-tab' onClick={this.onTabClick} >FACULTY DEVELOPMENT</a>
                                 </li>}
                             </ul>
                         </div>}
                     <div className='control-inner-container'>
-                        {(activePage == 'resident') && <ResidentDashboard dashboard_mode={dashboard_mode} />}
-                        {(activePage == 'normative') && <NormativeDashboard />}
+                        {(activePage == 'resident') && <ResidentDashboard isFamilyMedicine={isFamilyMedicine} dashboard_mode={dashboard_mode} />}
+                        {(activePage == 'normative') && <NormativeDashboard isFamilyMedicine={isFamilyMedicine} />}
                         {(activePage == 'supervisor') && <FacultyDashboard />}
                     </div>
                 </div>
@@ -55,7 +56,8 @@ class DashboardRoot extends Component {
 function mapStateToProps(state) {
     return {
         programInfo: state.oracle.programInfo,
-        activePage: state.oracle.activePage
+        activePage: state.oracle.activePage,
+        isFamilyMedicine: state.oracle.isFamilyMedicine
     };
 }
 

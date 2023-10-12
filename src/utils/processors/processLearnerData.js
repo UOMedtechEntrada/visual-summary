@@ -13,19 +13,18 @@ export default function (username, residentInfo, learnerDataDump) {
 
     // process the rating scale map
     // records come tagged with descriptor ID, we need to group the ratings by scale ID and then rate them by order.
-    let scale_map = _.groupBy(rating_scale_map, (d) => d.scale_id);
+    let scale_map = _.groupBy(rating_scale_map, (d) => d.scale_id), scale_title_map = {};
     // Order the ratings in a single scale so that they are in order based on the order tag
     _.map(scale_map, (scale, scale_id) => {
         scale_map[scale_id] = _.map(_.sortBy(scale, d => d.order), (e) => e.text);
+        scale_title_map[scale_id] = scale[0].rating_scale_title || '';
     });
-
     // This info is used in the GraphRow.jsx component
     window.dynamicDashboard.contextual_variable_map = _.groupBy(contextual_variables_map, (d) => d.form_id);
 
     // Group the contextual variables by item code first 
     const groupedContextualVariables = _.groupBy(contextual_variables, (d) => d.item_code);
     // Get the contextual_variables alone for now 
-    // TODO add patient and safety concerns 
     // Then group by form ID for easy access 
     const subGroupedContextualVariables = _.groupBy(groupedContextualVariables['CBME_contextual_variables'] || [], (d) => d.form_id);
     // For each form ID then further sub group by assessment ID
@@ -43,12 +42,12 @@ export default function (username, residentInfo, learnerDataDump) {
 
         return {
             username,
+            recordID: record.dassessment_id,
             Date: moment(record.encounter_date, 'MMM DD, YYYY').format('YYYY-MM-DD'),
             EPA: recordEPAtoNumber(record),
             Assessor_Name: record.assessor,
             Feedback: processComments(record),
             Assessor_Group: getAssessorType(record['assessor_group'], record['assessor_role']),
-            Professionalism_Safety: '',
             Rating: rating.order,
             Rating_Text: '(' + rating.order + ') ' + (rating.text || ''),
             Resident_Name: fullname,
@@ -58,7 +57,9 @@ export default function (username, residentInfo, learnerDataDump) {
             formID: record.form_id,
             formTitle: record.title,
             Academic_Year: getAcademicYear(moment(record.encounter_date, 'MMM DD, YYYY').format('YYYY-MM-DD')),
-            scale: scale_map[rating.scale_id] || ['Resident Entrustment']
+            scale: scale_map[rating.scale_id] || ['No Resident Entrustment Found'],
+            scaleTitle: scale_title_map[rating.scale_id] || ['No Matching Scale'],
+            concernFlagged: flagConcerns(record)
         }
     });
 
@@ -180,31 +181,58 @@ function recordEPAtoNumber(record) {
 function processComments(record) {
     // if comments exists parse them
     if (record.comments && record.comments.length > 0) {
-        // The comments can be of multiple types
+
+        // Since textual comments and rubric concerns items with comments are both reported on the same form
+        // we first split them into two groups 
+        let [concernComments = [], textualComments = []] = _.partition(record.comments, ({ type = '' }) => type.indexOf('concern') > -1);
+      
+        // The textual comments can be of multiple types
         // the comment of the type label: "Based on this..."
         // are the regular feedback so add them in first
         // sometimes there are multiple entries of this type, which can happen
         // if they enter a comment first and then edit it and save it
         // so get the longest comment 
-        let groupedComments = _.partition(record.comments, (d) => d.label.indexOf('Based on this') > -1);
+        let groupedComments = _.partition(textualComments, (d) => d.label.indexOf('Based on this') > -1);
         // the grouped comments is an array the first index contains all comments which are the feedback type
         // usually this is just one comment but sometimes the same entry gets
         // written multiple times so in those cases reduce it to the longest one.
-        let comment = _.reduce(groupedComments[0], (acc, d) => d.text.length > acc.length ? d.text : acc, '');
+        let commentCollection = _.reduce(groupedComments[0], (acc, d) => d.text.length > acc.length ? d.text : acc, '');
 
         // if the comment is non empty add an empty line after it.
-        comment = comment.length > 0 ? comment + '\n\n' : comment;
+        commentCollection = commentCollection.length > 0 ? commentCollection + '\n' : commentCollection;
 
-        // loop over any other comments if they exist
+        // loop over and add any other non feedback comments if they exist
         _.map(groupedComments[1] || [], (d) => {
             // for each , first add an empty line and then a gap line
             // Also capitalize the item title
-            comment += d.label.toLocaleUpperCase() + ": " + d.text + '\n\n';
+            commentCollection += d.label + ": " + d.text + '\n';
         });
 
-        return comment;
+        // For the concern comments, first check if a concern flag is set to Yes
+        // only then consider the comment
+        // as there are scenarios where concern comments are made and then the concern flag is set to No
+        // so the comment is no longer valid 
+        _.map(concernComments, (d) => {
+            let { descriptor = '' } = d;
+            if (descriptor.toLowerCase().indexOf('yes') > -1) {
+                commentCollection += d.label + ": " + d.text + '\n';
+            }
+        });
+
+        return commentCollection;
     }
     return '';
+}
+
+function flagConcerns(record) {
+    // if comments exists parse them
+    if (record.comments && record.comments.length > 0) {
+        // if a comment is of the concern type such as professionalism, safety concern, program review required etc 
+        // filter it out and then check if the concern descriptor is Yes 
+        let concernedComments = _.filter(record.comments, ({ type = '', descriptor = '' }) => (type.indexOf('concern') > -1) && (descriptor.toLowerCase().indexOf('yes') > -1));;
+        return concernedComments.length > 0;
+    }
+    return false;
 }
 
 
