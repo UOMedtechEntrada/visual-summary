@@ -1,7 +1,5 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { EPATextToNumber } from '../convertEPA';
-
 
 export default function (dashboard = '', learnersDataDump) {
 
@@ -112,10 +110,10 @@ function sanitise(value, placeholder) {
 }
 function recordEPAtoNumber(record, record_mapped_epa_list) {
     if (record_mapped_epa_list.length > 0) {
-        return EPATextToNumber(record_mapped_epa_list[0].objective_code || '');
+        return record_mapped_epa_list[0].objective_code || 'unmapped';
     }
     else if (record.form_type == 'Supervisor Form' && record.title.indexOf('-') > -1) {
-        return EPATextToNumber(record.title.split('-')[1].trim());
+        return record.title.split('-')[1].trim();
     }
     else { return 'unmapped' };
 }

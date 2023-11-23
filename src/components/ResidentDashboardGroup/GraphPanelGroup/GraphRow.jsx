@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import BulletChart from './BulletChart';
 import FormWrapper from './FormWrapper';
-import { NumberToEPAText } from "../../../utils/convertEPA";
 import _ from 'lodash';
 import { withTranslation } from "react-i18next";
 
@@ -74,7 +73,7 @@ class GraphRow extends Component {
             <div className='text-xs-center'>
                 <div style={{ width: widthPartition }} className='inner-cell epa-title-cell'>
                     <span className='inner-offset-label'>
-                        {NumberToEPAText(epaSource) + " - " + epaSourceMap.subRoot[epaSource]}
+                        {epaSourceMap.subRoot[epaSource]}
                     </span>
                 </div>
                 <div style={{ width: widthPartition }} className='inner-cell observation-cell'>

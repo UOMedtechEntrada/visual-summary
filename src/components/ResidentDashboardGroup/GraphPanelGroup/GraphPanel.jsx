@@ -204,7 +204,9 @@ class GraphPanel extends Component {
                                         innerKey={innerKey}
                                         smallScreen={smallScreen}
                                         isCurrentSubRootVisible={isCurrentSubRootVisible}
-                                        epaSourceMap={epaSpecificSourceMap} />
+                                        epaSourceMap={epaSpecificSourceMap}
+                                        residentEPAData={residentData}
+                                         />
 
                                     {/* Actual Row data containing labels and bullet and line charts */}
                                     <div className={'inner-graph-row ' + (isCurrentSubRootVisible ? 'show-row' : 'hide-row')}>

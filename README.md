@@ -8,7 +8,7 @@ This project uses [webpack](https://webpack.js.org/) to build the entire visual-
 
 ## Getting Started
 
-To get started you will need to have a version of Elentra (1.24 or above) running locally with CBME enabled courses. The visual summary page is an optional feature that needs to be enabled through a database setting (cbme_enable_visual_summary).
+To get started you will need to have a version of Elentra (1.23 or above) running locally with CBME enabled courses. The visual summary page is an optional feature that needs to be enabled through a database setting (cbme_enable_visual_summary).
 
 Also make sure to have Node JS and npm installed in your local environment to build the project.  
 

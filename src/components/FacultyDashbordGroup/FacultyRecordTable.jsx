@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import { customFilter } from '../../utils/genericUtility';
-import { NumberToEPAText } from "../../utils/convertEPA";
 import ReactTooltip from 'react-tooltip';
 import downloadCSV from '../../utils/downloadCSV';
 import _ from 'lodash';
@@ -21,7 +20,7 @@ class FacultyRecordTable extends Component {
                 , _.map(currentFacultyRecords[0].records, e =>
                 ([e['Date'] || '',
                 e['Resident_Name'] || '',
-                NumberToEPAText(String(e['EPA'])),
+                String(e['EPA']),
                 e['Rating'] || '',
                 e['Feedback'] || ''])),
                 'epa-summary-report');
@@ -88,7 +87,7 @@ class FacultyRecordTable extends Component {
                 </h3>,
                 <ReactTable
                     key='faculty-table'
-                    data={(_.map(innerRecords, (d) => ({ ...d, 'EPA': NumberToEPAText(d.EPA) })))}
+                    data={innerRecords}
                     columns={columns}
                     defaultPageSize={10}
                     resizable={false}

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import { customFilter } from '../../utils/genericUtility';
-import { NumberToEPAText } from "../../utils/convertEPA";
 import ReactTooltip from 'react-tooltip';
 import downloadCSV from '../../utils/downloadCSV';
 import moment from 'moment';
@@ -22,7 +21,7 @@ class FacultyExpiredRecordTable extends Component {
                 ([e['Date'] || '',
                 moment(e.Expiry_Date, 'MMM DD, YYYY').format('YYYY-MM-DD'),
                 e['Resident_Name'] || '',
-                NumberToEPAText(String(e['EPA'])),
+                e['EPA'],
                 e['Rating'] || '',
                 e['Feedback'] || ''])),
                 'expired-epa-report');
@@ -97,7 +96,7 @@ class FacultyExpiredRecordTable extends Component {
                 </h3>,
                 <ReactTable
                     key='faculty-table'
-                    data={(_.map(innerRecords, (d) => ({ ...d, 'Expiry_Date': moment(d.Expiry_Date, 'MMM DD, YYYY').format('YYYY-MM-DD'), 'EPA': NumberToEPAText(String(d.EPA)) })))}
+                    data={(_.map(innerRecords, (d) => ({ ...d, 'Expiry_Date': moment(d.Expiry_Date, 'MMM DD, YYYY').format('YYYY-MM-DD'), 'EPA': d.EPA })))}
                     columns={columns}
                     defaultPageSize={5}
                     resizable={false}

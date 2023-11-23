@@ -12,6 +12,9 @@ export default function (username, residentInfo, learnerDataDump) {
 
     let assessments_fixed = _.map(assessments, (e) => ({ ...e, 'comments': JSON.parse(e.comments), 'mapped_epas': JSON.parse(e.mapped_epas) }));
 
+    // Create an empty resusable epa map that maps the objective code of every epa with its training stage index and epa
+    // this info is used in the covertEPA.js function
+    window.dynamicDashboard.epa_map = {};
     // process and set the source map  
     const programInfo = getProgramInfo(dashboard_epas, epaProgress, course_name);
 
@@ -90,10 +93,17 @@ export default function (username, residentInfo, learnerDataDump) {
 let getAssessorType = (group = '', role = '') => (group == role) ? group : group + ' (' + role + ')';
 
 function getProgramInfo(epa_list, epaProgress, course_name) {
+
     let defaultSourceMap = {};
+
+    let epa_map_grouped_stage = _.groupBy(epa_list, d => d.stage_code);
+
     // Loop over every training stage and for each stage create an empty reference map
     _.map(dashboard_options.dashboard_stages, (training_stage, training_stage_index) => {
-        defaultSourceMap[training_stage_index + 1] = {
+
+        const training_stage_source_map_index = training_stage_index + 1;
+
+        defaultSourceMap[training_stage_source_map_index] = {
             'ID': training_stage.target_code,
             'topic': training_stage.target_label,
             subRoot: {},
@@ -105,60 +115,44 @@ function getProgramInfo(epa_list, epaProgress, course_name) {
             assessmentInfo: {},
             filterValuesDict: {}
         }
-    });
 
-    // Map over each EPA and append it to its corresponding entry in the sourcemap 
-    _.map(epa_list, (epa) => {
+        // Map over each EPA in a training stage and append it to its corresponding entry in the sourcemap 
+        _.map(epa_map_grouped_stage[training_stage.target_code] || [], (epa, epa_index) => {
 
-        // first find the corresponding EPA from the progess list 
-        let matchingEPA = _.find(epaProgress, (d) => d.objective_id == epa.target_id),
-            EPAID = false;
+            // first find the corresponding EPA from the progess list 
+            let matchingEPA = _.find(epaProgress, (d) => d.objective_id == epa.target_id);
 
-        // If a matchine EPA is found use that for the EPA ID
-        if (matchingEPA) {
-            EPAID = EPATextToNumber(matchingEPA.objective_code);
-        }
-        // If not try to get an EPA ID from the title
-        else {
-            EPAID = EPATextToNumber(epa.target_label.split(':')[0].trim());
-            matchingEPA = {};
-        }
-
-        try {
-
-            // If a training stage is not available then create one
-            if (!defaultSourceMap[EPAID[0]]) {
-                defaultSourceMap[EPAID[0]] = {
-                    'ID': EPAID[0],
-                    'topic': EPAID[0] + " UNMAPPED",
-                    subRoot: {},
-                    maxObservation: {},
-                    observed: {},
-                    completed: {},
-                    achieved: {},
-                    objectiveID: {},
-                    assessmentInfo: {},
-                    filterValuesDict: {}
-                }
+            // If a matchine EPA is not found stub it
+            if (!matchingEPA) {
+                matchingEPA = {};
             }
 
-            // set the EPA label
-            defaultSourceMap[EPAID[0]].subRoot[EPAID] = decodeHtmlEntity(getEPATitle(epa.target_title));
-            // set the EPA required observation count 
-            defaultSourceMap[EPAID[0]].maxObservation[EPAID] = matchingEPA.total_assessments_required || 0;
-            // set the EPA achieved count 
-            defaultSourceMap[EPAID[0]].observed[EPAID] = matchingEPA.total_assessment_attempts || 0;
-            // set the observed count 
-            defaultSourceMap[EPAID[0]].achieved[EPAID] = matchingEPA.total_requirement_met_assessments || 0;
-            // set the completed flag 
-            defaultSourceMap[EPAID[0]].completed[EPAID] = matchingEPA.completed || false;
-            // set the EPA objective ID 
-            defaultSourceMap[EPAID[0]].objectiveID[EPAID] = matchingEPA.objective_id || false;
+            // The epas are remapped into the older naming convention of 1.1, 1.2, 2.1,2.2 etc depending on training stage and epa index
+            // this is to ensure compatibility with older code
+            const epa_id = `${training_stage_source_map_index}.${epa_index + 1}`;
 
-        } catch (error) {
-            console.log(error);
-        }
+            try {
+                // set the EPA label
+                defaultSourceMap[training_stage_source_map_index].subRoot[epa_id] = decodeHtmlEntity(epa.target_title);
+                // set the EPA required observation count 
+                defaultSourceMap[training_stage_source_map_index].maxObservation[epa_id] = matchingEPA.total_assessments_required || 0;
+                // set the EPA achieved count 
+                defaultSourceMap[training_stage_source_map_index].observed[epa_id] = matchingEPA.total_assessment_attempts || 0;
+                // set the observed count 
+                defaultSourceMap[training_stage_source_map_index].achieved[epa_id] = matchingEPA.total_requirement_met_assessments || 0;
+                // set the completed flag 
+                defaultSourceMap[training_stage_source_map_index].completed[epa_id] = matchingEPA.completed || false;
+                // set the EPA objective ID 
+                defaultSourceMap[training_stage_source_map_index].objectiveID[epa_id] = matchingEPA.objective_id || false;
+                // store the objective code as reusable reference
+                window.dynamicDashboard.epa_map[epa.target_code] = epa_id;
+
+            } catch (error) {
+                console.log(error);
+            }
+        });
     });
+
 
     return {
         programName: course_name,
@@ -166,16 +160,9 @@ function getProgramInfo(epa_list, epaProgress, course_name) {
     }
 }
 
-
-let getEPATitle = (title) => title.slice(3).trim();
-
-
 function recordEPAtoNumber(record) {
     if (record.mapped_epas.length > 0) {
-        return EPATextToNumber(record.mapped_epas[0].objective_code || '');
-    }
-    else if (record.form_type == 'Supervisor Form' && record.title.indexOf('-') > -1) {
-        return EPATextToNumber(record.title.split('-')[1].trim());
+        return EPATextToNumber(record.mapped_epas[0].objective_code || 'unmapped');
     }
     else { return 'unmapped' };
 }
