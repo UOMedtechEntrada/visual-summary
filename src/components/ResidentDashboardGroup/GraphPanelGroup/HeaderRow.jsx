@@ -12,7 +12,7 @@ class HeaderRow extends Component {
 
         const { onStageLabelClick, innerKey, isCurrentSubRootVisible,
             epaSourceMap, residentList, residentFilter, t, residentEPAData } = this.props;
-        let requiredEPACount = 0, achievedEPACount = 0, residentInfo;
+        let requiredEPACount = 0, achievedEPACount = 0, residentInfo, currentPhase;
 
         _.map(epaSourceMap.maxObservation, (count, epaID) => {
             requiredEPACount += count;

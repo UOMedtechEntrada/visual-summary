@@ -98,6 +98,16 @@ function getProgramInfo(epa_list, epaProgress, course_name) {
 
     let epa_map_grouped_stage = _.groupBy(epa_list, d => d.stage_code);
 
+    // If there are epas but no stages, create a mock stage to hold them
+    if (dashboard_options.dashboard_stages.length === 0 && Object.keys(epa_map_grouped_stage).length > 0) {
+        dashboard_options.dashboard_stages.push({
+            target_id: 0,
+            target_label: Object.keys(epa_map_grouped_stage)[0],
+            target_code: Object.keys(epa_map_grouped_stage)[0],
+            target_order: 0
+        });
+    }
+
     // Loop over every training stage and for each stage create an empty reference map
     _.map(dashboard_options.dashboard_stages, (training_stage, training_stage_index) => {
 
