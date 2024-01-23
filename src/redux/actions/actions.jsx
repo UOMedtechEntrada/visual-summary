@@ -152,10 +152,52 @@ export function switchToResidentDashboard(residentInfo, residentFilter) {
     };
 }
 
+// Faculty Dasboard
+export function setFacultyFilter(facultyFilter) {
+    return { type: types.SET_FACULTY_FILTER, facultyFilter };
+}
 
+export function setFacultyList(facultyList) {
+    return { type: types.SET_FACULTY_LIST, facultyList };
+}
 
+export function setFacultyGroupList(groupList) {
+    return { type: types.SET_FACULTY_GROUP_LIST, groupList };
+}
 
+export function setFacultyDepartmentList(facultyDepartmentList) {
+    return { type: types.SET_FACULTY_DEPARTMENT_LIST, facultyDepartmentList };
+}
 
+export function setFacultyDashboardLoaderState(state) {
+    return { type: types.SET_FACULTY_LOADER_STATE, state };
+}
 
+export function setFacultyCourse(facultyCourse) {
+    return { type: types.SET_FACULTY_COURSE, facultyCourse };
+}
 
+export function setFacultyAcademicYear(academicYear) {
+    return { type: types.SET_FACULTY_ACADEMIC_YEAR, academicYear };
+}
 
+export function setFacultyResidentRecords(residentRecords) {
+    return { type: types.SET_FACULTY_RESIDENT_RECORDS, residentRecords };
+}
+
+// Program Evaluation Dashboard
+export function setProgramEvalFilter(filter) {
+    return { type: types.SET_PROGRAM_EVAL_FILTER, filter };
+}
+
+export function setProgramEvalAcademicYears(years) {
+    return { type: types.SET_PROGRAM_EVAL_ACADEMIC_YEARS, years };
+}
+
+export function setProgramEvalResidentRecords(residentRecords) {
+    return { type: types.SET_PROGRAM_EVAL_RESIDENT_RECORDS, residentRecords };
+}
+
+export function setProgramEvalLoaderState(state) {
+    return { type: types.SET_PROGRAM_EVAL_LOADER_STATE, state };
+}

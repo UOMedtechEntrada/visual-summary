@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { getAllData, getRotationSchedules } from '../../utils/requestServer';
 import _ from 'lodash';
 import ReactSelect from 'react-select';
 import ProgramAllYearsSummary from '../ProgramEvaluationGroup/ProgramAllYearsSummary';
 import ProgramBasePanel from '../ProgramEvaluationGroup/ProgramBasePanel';
+import AcademicYearFilterPanel from '../ReusableComponents/AcademicYearFilterPanel';
+import {setProgramEvalLoaderState, setProgramEvalFilter, setProgramEvalAcademicYears, setProgramEvalResidentRecords} from '../../redux/actions/actions';
 import moment from 'moment';
 import downloadCSV from '../../utils/downloadCSV';
 import { possibleAcademicYears } from '../../utils/getAcademicYears';
@@ -13,28 +16,37 @@ class ProgramDashboard extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            isLoaderVisible: false,
-            // list of all resident records
-            allResidentRecords: [],
-            academicYears: possibleAcademicYears.slice(1)
-        };
+        this.state = {};
+
+        const { academicYears, actions } = this.props;
+        if (academicYears.length == 0) {
+            actions.setProgramEvalAcademicYears(possibleAcademicYears.slice(1));
+        }
+
         this._isMounted = false;
         this.onSubmit = this.onSubmit.bind(this);
     }
 
     onSelectAcademicYear = (academicYears) => {
         const sortedYears = _.sortBy(academicYears, d => d.label);
-        this.setState({ 'academicYears': sortedYears, allResidentRecords: [] })
+        this.props.actions.setProgramEvalAcademicYears( sortedYears );
+        this.props.actions.setProgramEvalResidentRecords([]);
+    };
+
+    onDatesChange = ({ startDate, endDate }) => {
+        let { programEvalFilter = {}, actions } = this.props;
+        programEvalFilter.startDate = startDate;
+        programEvalFilter.endDate = endDate;
+        actions.setProgramEvalFilter({ ...programEvalFilter });
     };
 
     async onSubmit() {
-        const { academicYears } = this.state;
+        const { academicYears } = this.props;
         const yearList = _.map(academicYears, d => d.value);
 
         if (yearList.length > 0) {
             // turn loader on
-            this.setState({ isLoaderVisible: true });
+            this.props.actions.setProgramEvalLoaderState(true);
 
             Promise.all(yearList.map((y) => getAllData('program', y)))
                 .then((year_data_list) => {
@@ -48,10 +60,24 @@ class ProgramDashboard extends Component {
                 })
                 .then((allResidentRecords) => {
                     // set the values on the state 
-                    this._isMounted && this.setState({ allResidentRecords, isLoaderVisible: false });
+                    if (this._isMounted) {
+                        let { programEvalFilter, actions } = this.props;
+                        actions.setProgramEvalResidentRecords(allResidentRecords);
+                        programEvalFilter.startDate = null;
+                        programEvalFilter.endDate = null;
+                        actions.setProgramEvalFilter({...programEvalFilter});
+                        actions.setProgramEvalLoaderState(false);
+                    }
                 })
                 .catch(() => {
-                    this._isMounted && this.setState({ isLoaderVisible: false, allResidentRecords: [] });
+                    if (this._isMounted) {
+                        let { programEvalFilter, actions } = this.props;
+                        actions.setProgramEvalResidentRecords([]);
+                        programEvalFilter.startDate = null;
+                        programEvalFilter.endDate = null;
+                        actions.setProgramEvalFilter({...programEvalFilter});
+                        actions.setProgramEvalLoaderState(false);
+                    }
                     console.log("error in fetching all resident records");
                 });
         }
@@ -63,9 +89,10 @@ class ProgramDashboard extends Component {
 
     downloadReport = () => {
 
-        const { allResidentRecords = [] } = this.state, { t } = this.props;
+        const { allResidentRecords = [], t } = this.props;
+        let allResidentRecordsClone = this.filterResidentRecords();
 
-        if (allResidentRecords.length > 0) {
+        if (allResidentRecordsClone.length > 0) {
             downloadCSV([
                 'Academic Year',
                 'Encounter Date',
@@ -83,7 +110,7 @@ class ProgramDashboard extends Component {
                 'Triggered_By',
                 'Assessment_Method',
             ]
-                , _.map(allResidentRecords, e =>
+                , _.map(allResidentRecordsClone, e =>
                 ([e['Academic_Year'] || '',
                 e['Date'] || '',
                 moment(e.Expiry_Date, 'MMM DD, YYYY').format('YYYY-MM-DD'),
@@ -105,12 +132,33 @@ class ProgramDashboard extends Component {
 
     }
 
+    // returns a filtered copy of the resident records
+    filterResidentRecords() {
+        const { allResidentRecords, programEvalFilter } = this.props;
+        const { startDate, endDate } = programEvalFilter;
+
+        let allResidentRecordsClone = _.clone(allResidentRecords);
+        
+        // Filter the data within the date bounds (if set)
+        if (startDate) {
+            const startTimestamp = Date.parse(startDate.format('YYYY-MM-DD'));
+            allResidentRecordsClone = _.filter(allResidentRecordsClone, (d) => Date.parse(d.Date) >= startTimestamp);
+        }
+    
+        if (endDate) {
+            const endTimestamp = Date.parse(endDate.format('YYYY-MM-DD'));
+            allResidentRecordsClone = _.filter(allResidentRecordsClone, (d) => Date.parse(d.Date) <= endTimestamp);
+        }
+        return allResidentRecordsClone;
+    }
 
     render() {
 
-        const { academicYears, allResidentRecords = [] } = this.state,
-            { t } = this.props,
-            fullWidth = document.body.getBoundingClientRect().width - 300;
+        const { academicYears, allResidentRecords = [], isLoaderVisible, programEvalFilter, t } = this.props;
+        const { startDate, endDate } = programEvalFilter;
+        const fullWidth = document.body.getBoundingClientRect().width - 300;
+
+        let allResidentRecordsClone = this.filterResidentRecords();
 
         return (
             <div className='dashboard-root-program m-b-lg' >
@@ -130,12 +178,19 @@ class ProgramDashboard extends Component {
                         {t("GET RECORDS")}
                     </button>
                 </div>
-                {this.state.isLoaderVisible ?
+                {academicYears.length === 1 && allResidentRecords.length > 0 &&
+                    <AcademicYearFilterPanel
+                        academicYear={academicYears[0]}
+                        onDatesChange={this.onDatesChange}
+                        startDate={startDate}
+                        endDate={endDate}/>
+                }
+                {isLoaderVisible ?
                     <div className='text-center'>
                         <i className='fa fa-spinner fa-5x fa-spin m-t-lg' aria-hidden="true"></i>
                     </div> :
                     <div className='container-fluid'>
-                        {allResidentRecords.length > 0 &&
+                        {allResidentRecordsClone.length > 0 &&
                             <div>
                                 <div className='text-right m-r-md m-t-md'>
                                     <button onClick={this.downloadReport} className='btn btn btn-primary-outline'> <i className="fa fa-download"></i>
@@ -144,12 +199,12 @@ class ProgramDashboard extends Component {
                                 </div>
                                 <ProgramAllYearsSummary
                                     width={fullWidth}
-                                    allRecords={allResidentRecords}
+                                    allRecords={allResidentRecordsClone}
                                     possibleAcademicYears={_.reverse(academicYears)} />
                                 <ProgramBasePanel
                                     isUG={this.props.isUG}
                                     width={fullWidth}
-                                    allRecords={allResidentRecords}
+                                    allRecords={allResidentRecordsClone}
                                     possibleAcademicYears={_.reverse(academicYears)} />
                             </div>}
                     </div>}
@@ -161,8 +216,23 @@ class ProgramDashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        isUG: state.oracle.isUG
+        isUG: state.oracle.isUG,
+        isLoaderVisible: state.oracle.programEvalLoaderState,
+        programEvalFilter: state.oracle.programEvalFilter,
+        academicYears: state.oracle.programEvalAcademicYears,
+        allResidentRecords: state.oracle.programEvalResidentRecords
     };
 }
 
-export default withTranslation()(connect(mapStateToProps, {})(ProgramDashboard));
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({
+            setProgramEvalLoaderState,
+            setProgramEvalFilter,
+            setProgramEvalAcademicYears,
+            setProgramEvalResidentRecords
+        }, dispatch)
+    };
+}
+
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(ProgramDashboard));

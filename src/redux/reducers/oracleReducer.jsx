@@ -32,6 +32,34 @@ export default function oracleReducer(state = initialState.oracle, action) {
       return Object.assign({}, state, { visibilityOpenStatus: action.visibilityOpenStatus })
     case types.SET_PROGRAM_INFO:
       return Object.assign({}, state, { programInfo: action.programInfo })
+
+    // Faculty Dashboard actions
+    case types.SET_FACULTY_FILTER:
+      return Object.assign({}, state, { facultyFilter: action.facultyFilter })
+    case types.SET_FACULTY_LIST:
+      return Object.assign({}, state, { facultyList: action.facultyList })
+    case types.SET_FACULTY_GROUP_LIST:
+      return Object.assign({}, state, { facultyGroupList: action.groupList })
+    case types.SET_FACULTY_DEPARTMENT_LIST:
+      return Object.assign({}, state, { facultyDepartmentList: action.facultyDepartmentList })
+    case types.SET_FACULTY_LOADER_STATE:
+      return Object.assign({}, state, { facultyDashboardLoaderState: action.state })
+    case types.SET_FACULTY_COURSE:
+      return Object.assign({}, state, { facultyCourse: action.facultyCourse })
+    case types.SET_FACULTY_ACADEMIC_YEAR:
+      return Object.assign({}, state, { facultyAcademicYear: action.academicYear })
+    case types.SET_FACULTY_RESIDENT_RECORDS:
+      return Object.assign({}, state, { facultyDashboardResidentRecords: action.residentRecords})
+
+    // Program Evaluation Dashboard actions
+    case types.SET_PROGRAM_EVAL_FILTER:
+      return Object.assign({}, state, { programEvalFilter: action.filter })
+    case types.SET_PROGRAM_EVAL_ACADEMIC_YEARS:
+      return Object.assign({}, state, { programEvalAcademicYears: action.years })
+    case types.SET_PROGRAM_EVAL_RESIDENT_RECORDS:
+      return Object.assign({}, state, { programEvalResidentRecords: action.residentRecords })
+    case types.SET_PROGRAM_EVAL_LOADER_STATE:
+      return Object.assign({}, state, { programEvalLoaderState: action.state })
     default:
       return state;
   }

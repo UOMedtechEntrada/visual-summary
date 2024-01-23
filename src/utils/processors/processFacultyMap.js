@@ -2,9 +2,19 @@ import _ from 'lodash';
 const phaseList = dashboard_options.dashboard_stages.map((d) => d.target_code);
 window.mostCommonScaleRatings = [];
 
-export default function (allResidentRecords = [], currentFacultyGroup, currentDepartment) {
+export default function (allResidentRecords = [], currentFacultyGroup, currentDepartment, startDate, endDate) {
 
     let allResidentRecordsClone = _.clone(allResidentRecords);
+
+    if (startDate) {
+        const startTimestamp = Date.parse(startDate.format('YYYY-MM-DD'));
+        allResidentRecordsClone = _.filter(allResidentRecordsClone, (d) => Date.parse(d.Date) >= startTimestamp);
+    }
+
+    if (endDate) {
+        const endTimestamp = Date.parse(endDate.format('YYYY-MM-DD'));
+        allResidentRecordsClone = _.filter(allResidentRecordsClone, (d) => Date.parse(d.Date) <= endTimestamp);
+    }
 
     // Filter by assessor group
     if (currentFacultyGroup != 'ALL' && currentFacultyGroup != '') {

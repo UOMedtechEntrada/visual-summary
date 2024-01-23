@@ -24,6 +24,31 @@ export default {
       3: true,
       4: true
     },
-    programInfo: null
+    programInfo: null,
+
+    // faculty dashboard
+    facultyFilter: {
+      faculty: 'ALL',
+      facultyGroup: 'ALL',
+      department: 'ALL',
+      startDate: null,
+      endDate: null
+    },
+    facultyList: [],
+    facultyGroupList: [],
+    facultyDepartmentList: [],
+    facultyCourse: null,
+    facultyAcademicYear: null,
+    facultyDashboardResidentRecords: [],
+    facultyDashboardLoaderState: false,
+
+    // program evaluation dashboard
+    programEvalFilter: {
+      startDate: null,
+      endDate: null
+    },
+    programEvalAcademicYears: [],
+    programEvalLoaderState: false,
+    programEvalResidentRecords: []
   }
 };

@@ -8,3 +8,13 @@ export const possibleAcademicYears = [4, 3, 2, 1, 0].map(e => {
 });
 
 export const currentAcademicYear = possibleAcademicYears[4];
+
+export const getAcademicYearStartDate = function(academicYear) {
+    // July 1st
+    return new Date(academicYear, 6, 1);
+};
+
+export const getAcademicYearEndDate = function(academicYear) {
+    // Last day of June
+    return new Date(academicYear+1, 6, 0);
+};

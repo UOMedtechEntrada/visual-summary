@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import _ from 'lodash';
 import { getAllData } from '../../utils/requestServer';
 import ReactSelect from 'react-select';
@@ -8,69 +10,98 @@ import {
     FacultyRecordTable, FacultyGraphGroup, FacultyExpiredRecordTable
 } from '../';
 import { currentAcademicYear, possibleAcademicYears } from '../../utils/getAcademicYears';
+import {
+    setFacultyDashboardLoaderState, setFacultyAcademicYear, setFacultyResidentRecords, setFacultyList, setFacultyGroupList, setFacultyDepartmentList,
+    setFacultyCourse, setFacultyFilter
+} from '../../redux/actions/actions';
 import downloadCSV from '../../utils/downloadCSV';
 import { withTranslation } from "react-i18next";
+import AcademicYearFilterPanel from '../ReusableComponents/AcademicYearFilterPanel';
 
 class FacultyDashboard extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            currentFaculty: "ALL",
-            currentFacultyGroup: "ALL",
-            currentDepartment: "ALL",
-            facultyList: [],
-            facultyGroupList: [],
-            departmentList: [],
-            courseName: '',
-            // list of all resident records
-            allResidentRecords: [],
-            isLoaderVisible: false,
-            academicYear: currentAcademicYear
-        };
+        this.state = {};
+        
+        if (!this.props.academicYear) {
+            this.props.actions.setFacultyAcademicYear(currentAcademicYear);
+        }
         this._isMounted = false;
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    onFacultyClick = (event) => { this.setState({ 'currentFaculty': event.target.id.slice(12).split('--').join(' ') }) }
-    onFacultySelect = (option) => { this.setState({ currentFaculty: option.value }) }
-    onCurrentFacultyGroupSelect = (option) => { this.setState({ currentFacultyGroup: option.value }) }
-    onCurrentDepartmentSelect = (option) => { this.setState({ currentDepartment: option.value }) }
+    onFacultyClick = (event) => {
+        let { facultyFilter = {}, actions } = this.props;
+        facultyFilter.faculty = event.target.id.slice(12).split('--').join(' ');
+        actions.setFacultyFilter({ ...facultyFilter });
+    }
 
-    onSelectAcademicYear = (academicYear) => { this.setState({ academicYear }) };
+    onFacultySelect = (option) => {
+        let { facultyFilter = {}, actions } = this.props;
+        facultyFilter.faculty = option.value;
+        actions.setFacultyFilter({ ...facultyFilter });
+    }
+    onCurrentFacultyGroupSelect = (option) => {
+        let { facultyFilter = {}, actions } = this.props;
+        facultyFilter.facultyGroup = option.value;
+        actions.setFacultyFilter({ ...facultyFilter });
+    }
+    onCurrentDepartmentSelect = (option) => {
+        let { facultyFilter = {}, actions } = this.props;
+        facultyFilter.department = option.value;
+        actions.setFacultyFilter({ ...facultyFilter });
+    }
+
+    onDatesChange = ({ startDate, endDate }) => {
+        let { facultyFilter = {}, actions } = this.props;
+        facultyFilter.startDate = startDate;
+        facultyFilter.endDate = endDate;
+        actions.setFacultyFilter({ ...facultyFilter });
+    }
+
+    onSelectAcademicYear = (academicYear) => {
+        this.props.actions.setFacultyAcademicYear( academicYear );
+    }
 
     async onSubmit() {
-        const { academicYear } = this.state;
         // turn loader on
-        this.setState({ isLoaderVisible: true });
-        getAllData('faculty', academicYear.value)
+        this.props.actions.setFacultyDashboardLoaderState(true);
+        getAllData('faculty', this.props.academicYear.value)
             .then(({ allResidentRecords, facultyList, departmentList, facultyGroupList, courseName }) => {
                 // set the values on the state 
-                this._isMounted && this.setState({
-                    allResidentRecords,
-                    facultyList,
-                    facultyGroupList,
-                    departmentList,
-                    courseName,
-                    currentFaculty: "ALL",
-                    currentFacultyGroup: "ALL",
-                    currentDepartment: "ALL",
-                    isLoaderVisible: false
-                });
+                const { actions } = this.props;
+                actions.setFacultyResidentRecords(allResidentRecords);
+                actions.setFacultyList(facultyList);
+                actions.setFacultyGroupList(facultyGroupList);
+                actions.setFacultyDepartmentList(departmentList);
+                actions.setFacultyCourse(courseName);
+                let { facultyFilter = {} } = this.props;
+                facultyFilter.faculty = 'ALL';
+                facultyFilter.facultyGroup = 'ALL';
+                facultyFilter.deparment = 'ALL';
+                facultyFilter.startDate = null;
+                facultyFilter.endDate = null;
+                actions.setFacultyFilter({ ...facultyFilter });
+                actions.setFacultyDashboardLoaderState(false);
             })
             // toggle loader again once the request completes
             .catch(() => {
+                const { actions } = this.props;
+                actions.setFacultyResidentRecords([]);
+                actions.setFacultyList([]);
+                actions.setFacultyGroupList([]);
+                actions.setFacultyDepartmentList([]);
+                actions.setFacultyCourse('');
+                let { facultyFilter = {} } = this.props;
+                facultyFilter.faculty = 'ALL';
+                facultyFilter.facultyGroup = 'ALL';
+                facultyFilter.deparment = 'ALL';
+                facultyFilter.startDate = null;
+                facultyFilter.endDate = null;
+                actions.setFacultyFilter({ ...facultyFilter });
+                actions.setFacultyDashboardLoaderState(false);
                 console.log("error in fetching all resident records");
-                this._isMounted && this.setState({
-                    allResidentRecords: [],
-                    facultyList: [],
-                    facultyGroupList: [],
-                    departmentList: [],
-                    currentFaculty: "ALL",
-                    currentFacultyGroup: "ALL",
-                    currentDepartment: "ALL",
-                    isLoaderVisible: false
-                });
             });
     }
 
@@ -92,10 +123,14 @@ class FacultyDashboard extends Component {
 
     downloadReport = () => {
 
-        const { allResidentRecords = [], academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state,
-            { t } = this.props;
+        const { allResidentRecords = [], academicYear, facultyFilter, t } = this.props;
+        const currentFaculty = facultyFilter.faculty;
+        const currentFacultyGroup = facultyFilter.facultyGroup;
+        const currentDepartment = facultyFilter.department;
+        const startDate = facultyFilter.startDate;
+        const endDate = facultyFilter.endDate;
 
-        const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment),
+        const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment, startDate, endDate),
             relevantData = _.map(processedRecords, d => {
                 let expiredCount = d.expiredRecords.length,
                     completedCount = d.records.length,
@@ -112,10 +147,17 @@ class FacultyDashboard extends Component {
     render() {
 
         const { facultyGroupList = [], facultyList = [], departmentList = [], allResidentRecords = [],
-            courseName, isLoaderVisible, academicYear, currentFaculty, currentFacultyGroup, currentDepartment } = this.state,
-            { t } = this.props;
+            courseName, isLoaderVisible, facultyFilter, actions, t } = this.props;
 
-        const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment),
+        let { academicYear } = this.props
+        
+        const currentFaculty = facultyFilter.faculty;
+        const currentFacultyGroup = facultyFilter.facultyGroup;
+        const currentDepartment = facultyFilter.department;
+        const startDate = facultyFilter.startDate;
+        const endDate = facultyFilter.endDate;        
+
+        const processedRecords = processFacultyMap(allResidentRecords, currentFacultyGroup, currentDepartment, startDate, endDate),
             currentFacultyRecords = _.filter(processedRecords, (d) => d.faculty_name == currentFaculty),
             overallWidth = window.dynamicDashboard.mountWidth;
 
@@ -164,6 +206,14 @@ class FacultyDashboard extends Component {
                                     onCurrentDepartmentSelect={this.onCurrentDepartmentSelect}
                                     onFacultySelect={this.onFacultySelect} />
 
+                                <div>
+                                    <AcademicYearFilterPanel
+                                        academicYear={academicYear}
+                                        onDatesChange={this.onDatesChange}
+                                        startDate={startDate}
+                                        endDate={endDate}/>
+                                </div>
+
                                 <div className='m-a'>
 
                                     <div className='text-right m-r-md m-t-md no-printing'>
@@ -204,4 +254,32 @@ class FacultyDashboard extends Component {
 
 }
 
-export default withTranslation()(FacultyDashboard);
+function mapStateToProps(state) {
+    return {
+        facultyFilter: state.oracle.facultyFilter,
+        facultyList: state.oracle.facultyList,
+        facultyGroupList: state.oracle.facultyGroupList,
+        departmentList: state.oracle.facultyDepartmentList,
+        courseName: state.oracle.facultyCourse,
+        allResidentRecords: state.oracle.facultyDashboardResidentRecords,
+        isLoaderVisible: state.oracle.facultyDashboardLoaderState,
+        academicYear: state.oracle.facultyAcademicYear
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({
+            setFacultyDashboardLoaderState, 
+            setFacultyAcademicYear, 
+            setFacultyResidentRecords, 
+            setFacultyList, 
+            setFacultyGroupList, 
+            setFacultyDepartmentList,
+            setFacultyCourse,
+            setFacultyFilter
+        }, dispatch)
+    };
+}
+
+export default withTranslation()(connect(mapStateToProps, mapDispatchToProps)(FacultyDashboard));

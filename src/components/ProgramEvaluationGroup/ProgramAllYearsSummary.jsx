@@ -11,23 +11,15 @@ class ProgramAllYearSummary extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            summaryData: []
-        }
+        this.state = {}
     }
 
-    componentDidMount() {
-        const { allRecords, possibleAcademicYears } = this.props;
-        let summaryData = [];
-        _.map(possibleAcademicYears,
-            (academicYear) => summaryData.push(processSingleProgramRecords(allRecords, academicYear)['summaryData']));
-        this.setState({ summaryData });
-    }
 
     render() {
-        const { width, possibleAcademicYears, t } = this.props,
-            { summaryData } = this.state,
-            custom_data = _.map(summaryData, (d, yearIndex) => {
+        const { width, possibleAcademicYears, allRecords, t } = this.props;
+        let summaryData = [];
+        _.map(possibleAcademicYears, (academicYear) => summaryData.push(processSingleProgramRecords(allRecords, academicYear)['summaryData']));
+        let custom_data = _.map(summaryData, (d, yearIndex) => {
                 return {
                     'year': possibleAcademicYears[yearIndex].label,
                     'resident_count': d.resident_count,
