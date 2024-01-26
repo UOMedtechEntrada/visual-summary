@@ -36,7 +36,7 @@ class DashboardRoot extends Component {
                                 <li className={activePage == 'normative' ? 'active' : ''}>
                                     <a data-tip={infoTooltipReference.normativeAssessment.main} id='normative-tab' onClick={this.onTabClick} >NORMATIVE ASSESSMENT</a>
                                 </li>
-                                {advanced_mode == 'enabled' && !isFamilyMedicine && <li className={activePage == 'supervisor' ? 'active' : ''}>
+                                {advanced_mode == 'enabled' && <li className={activePage == 'supervisor' ? 'active' : ''}>
                                     <a data-tip={infoTooltipReference.facultyDevlopment.main} id='supervisor-tab' onClick={this.onTabClick} >FACULTY DEVELOPMENT</a>
                                 </li>}
                             </ul>
@@ -44,7 +44,7 @@ class DashboardRoot extends Component {
                     <div className='control-inner-container'>
                         {(activePage == 'resident') && <ResidentDashboard isFamilyMedicine={isFamilyMedicine} dashboard_mode={dashboard_mode} />}
                         {(activePage == 'normative') && <NormativeDashboard isFamilyMedicine={isFamilyMedicine} />}
-                        {(activePage == 'supervisor') && <FacultyDashboard />}
+                        {(activePage == 'supervisor') && <FacultyDashboard isFamilyMedicine={isFamilyMedicine}/>}
                     </div>
                 </div>
             </div>

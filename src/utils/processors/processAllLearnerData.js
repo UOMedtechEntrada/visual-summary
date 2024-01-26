@@ -35,6 +35,7 @@ export default function (learnersDataDump) {
             Type: record.form_type,
             formID: record.form_id,
             Academic_Year: getAcademicYear(moment(record.encounter_date, 'MMM DD, YYYY').format('YYYY-MM-DD')),
+            Course_Name: course_name,
             scale: scale_map[rating.scale_id] || ['No Resident Entrustment Found']
         }
     });

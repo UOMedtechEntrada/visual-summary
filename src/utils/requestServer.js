@@ -42,11 +42,12 @@ requestServer.getLearnerData = function (username, residentInfo) {
     });
 }
 
-requestServer.getAllData = function () {
+// course_id defaults to the active course if no course ID is passed
+requestServer.getAllData = function (overrideCourse = false, customCourseID) {
     return new Promise((resolve, reject) => {
         axios.get(endPoints.learners, {
             'params': {
-                'course_id': course_id,
+                'course_id': overrideCourse ? customCourseID : course_id,
                 'section': 'api-learner-progress-dashboard',
                 'method': 'get-all-learner-assessments'
             }

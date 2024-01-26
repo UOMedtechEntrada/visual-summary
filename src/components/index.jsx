@@ -20,6 +20,12 @@ export { default as FacultyInfoGroup } from './FacultyDashbordGroup/FacultyInfoG
 export { default as FacultyGraphGroup } from './FacultyDashbordGroup/FacultyGraphGroup';
 export { default as FacultyRecordTable } from './FacultyDashbordGroup/FacultyRecordTable';
 
+// Components for Faculty Dashboard to compare residents
+export { default as FMFacultyFilterPanel } from './FacultyDashbordGroup/FamilyMedicineFacultyDashboardGroup/FacultyFilterPanel';
+export { default as FMFacultyInfoGroup } from './FacultyDashbordGroup/FamilyMedicineFacultyDashboardGroup/FacultyInfoGroup';
+export { default as FMFacultyGraphGroup } from './FacultyDashbordGroup/FamilyMedicineFacultyDashboardGroup/FacultyGraphGroup';
+export { default as FMFacultyRecordTable } from './FacultyDashbordGroup/FamilyMedicineFacultyDashboardGroup/FacultyRecordTable';
+
 
 // Reusable components 
 export { default as RadioButton } from './ReusableComponents/RadioButton';

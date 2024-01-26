@@ -2,11 +2,18 @@ import * as d3 from 'd3';
 const phaseList = ['D', 'F', 'C', 'P'];
 import { EPATextToNumber } from '../convertEPA';
 
-export default function (allResidentRecords = [], epas = [], currentAcademicYear, minimumRequired) {
+export default function (allResidentRecords = [], epas = [], currentAcademicYear, minimumRequired, isFamilyMedicine, currentCourse) {
 
     let allResidentRecordsClone = _.clone(allResidentRecords);
+
+    // For family medicine programs, if the  current course is ALL or not selected then use all resident records as in,
+    // if not filter out all records that were completed in that particular course
+    if (isFamilyMedicine && currentCourse != 'ALL' && currentCourse != '') {
+        allResidentRecordsClone = _.filter(allResidentRecords, (d) => d.Course_Name == currentCourse);
+    }
+
     // if the  current Academic Year is ALL or not selected then use all resident records as in,
-    // if not filter out all records that were marked in that rotation
+    // if not filter out all records that were marked in that year
     if (currentAcademicYear != 'ALL' && currentAcademicYear != '') {
         allResidentRecordsClone = _.filter(allResidentRecords, (d) => d.Academic_Year == currentAcademicYear);
     }
